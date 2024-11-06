@@ -1,0 +1,10 @@
+[init]
+short = "Init jvs data directory."
+long = "Specific a directory as data directory. All data will store in this directory."
+
+[add]
+short = "添加动态环境变量"
+long = ""
+
+[error]
+noenv = "Please set environment variable `DENV_HOME` before using it."

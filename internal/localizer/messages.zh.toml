@@ -1,0 +1,10 @@
+[init]
+short = "初始化 jvs"
+long = "将指定目录指定为数据目录，所有的数据将存放在该目录中。"
+
+[add]
+short = "添加动态环境变量"
+long = ""
+
+[error]
+noenv = "请在使用前先设置 `DENV_HOME`。"
