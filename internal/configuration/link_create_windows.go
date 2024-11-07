@@ -2,20 +2,17 @@ package configuration
 
 import (
 	"errors"
-	"fmt"
 	"os/exec"
-	"strings"
 
 	"github.com/axgle/mahonia"
+	"github.com/link-manager/internal/logger"
 )
 
+// Create link and bypass admin permission requirement on windows.
 func createLink(src, des string) error {
-	src = strings.ReplaceAll(src, "/", "\\")
-	des = strings.ReplaceAll(des, "/", "\\")
-	// bypass admin permission requirement.
 	cmd := exec.Command("cmd", "/c", "mklink", "/J", des, src)
 
-	fmt.Println(cmd)
+	logger.LogDebug("Running Command: " + cmd.String())
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		decoder := mahonia.NewDecoder("gbk")

@@ -16,11 +16,26 @@ type Link struct {
 	Path string
 }
 
+func (t Link) String() string {
+	return t.Name + ":" + t.Alias
+}
+
+type LinkBindItem struct {
+	Name  string
+	Alias string
+}
+
+func (t LinkBindItem) String() string {
+	return t.Name + ":" + t.Alias
+}
+
+type BindsData map[string][]LinkBindItem
+
 type configuration struct {
 	DeclariedLinkNames []string
 	Envs               []Link
 	// Env.Name:Env.Alias -> Env
-	Binds map[string]Link
+	Binds BindsData
 }
 
 var cache *configuration = nil
@@ -35,7 +50,7 @@ func readConfig() configuration {
 		return configuration{
 			DeclariedLinkNames: make([]string, 0),
 			Envs:               make([]Link, 0),
-			Binds:              map[string]Link{},
+			Binds:              map[string][]LinkBindItem{},
 		}
 	}
 	content, err := os.ReadFile(configFilePath)
@@ -89,9 +104,35 @@ func AddEnvValue(env *Link) error {
 	return nil
 }
 
-func ListEnv(name string) []Link {
+func getBindMapKey(name, alias string) string {
+	return name + ":" + alias
+}
+
+// target 绑定到 src
+func AddLink(src, target *LinkBindItem) error {
 	config := readConfig()
-	result := make([]Link, 2)
+	key := getBindMapKey(src.Name, src.Alias)
+	old, ok := config.Binds[key]
+	if ok {
+		config.Binds[key] = append(old, *target)
+	} else {
+		config.Binds[key] = []LinkBindItem{*target}
+	}
+	saveConfig(&config)
+	return nil
+}
+
+func ListLinkNames() []string {
+	return readConfig().DeclariedLinkNames
+}
+
+// 列出所有链接的值。当不传 name 时，返回所有的值
+func ListLinkValues(name string) []Link {
+	config := readConfig()
+	if name == "" {
+		return config.Envs
+	}
+	result := make([]Link, 0)
 	for _, v := range config.Envs {
 		if v.Name == name {
 			result = append(result, v)
@@ -101,11 +142,25 @@ func ListEnv(name string) []Link {
 }
 
 func FindEnvByNameAndAlias(name, aliase string) *Link {
-	envs := ListEnv(name)
+	envs := ListLinkValues(name)
 	for _, v := range envs {
 		if v.Alias == aliase {
 			return &v
 		}
 	}
 	return nil
+}
+
+func ListBinds(item *LinkBindItem) []LinkBindItem {
+	config := readConfig()
+
+	value, ok := config.Binds[getBindMapKey(item.Name, item.Alias)]
+	if !ok {
+		return make([]LinkBindItem, 0)
+	}
+	return value
+}
+
+func GetAllBinds() BindsData {
+	return readConfig().Binds
 }

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/link-manager/internal/configuration"
 
@@ -16,10 +17,17 @@ func init() {
 		Run: func(cmd *cobra.Command, args []string) {
 			env := configuration.FindEnvByNameAndAlias(args[0], args[1])
 			if env == nil {
+				LogError("链接或别名不存在")
 				return
 			}
-			configuration.UseEnv(env)
-			fmt.Println("设置成功")
+			r := configuration.UseLink(env)
+			var builder strings.Builder
+			for _, v := range r {
+				builder.WriteString("切换为: ")
+				builder.WriteString(v.String())
+				builder.WriteString("\n")
+			}
+			fmt.Print(builder.String())
 		},
 		Args: cobra.MinimumNArgs(1),
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/link-manager/internal/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -13,6 +14,10 @@ var rootCmd = &cobra.Command{
 	Long: `A Fast and Flexible Static Site Generator built with
 				  love by spf13 and friends in Go.
 				  Complete documentation is available at http://hugo.spf13.com`,
+}
+
+func init() {
+	rootCmd.PersistentFlags().BoolVar(&logger.DebugEnable, "debug", false, "Enable debug logger.")
 }
 
 func Execute() {
