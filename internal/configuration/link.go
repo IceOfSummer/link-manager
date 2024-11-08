@@ -6,7 +6,7 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/link-manager/internal/logger"
+	"github.com/symbolic-link-manager/internal/logger"
 )
 
 const appDirectory = "app"

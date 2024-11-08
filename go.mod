@@ -1,4 +1,4 @@
-module github.com/link-manager
+module github.com/symbolic-link-manager
 
 go 1.23.1
 

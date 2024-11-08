@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/link-manager/internal/logger"
 	"github.com/spf13/cobra"
+	"github.com/symbolic-link-manager/internal/logger"
 )
 
 var rootCmd = &cobra.Command{

@@ -5,7 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/axgle/mahonia"
-	"github.com/link-manager/internal/logger"
+	"github.com/symbolic-link-manager/internal/logger"
 )
 
 // Create link and bypass admin permission requirement on windows.

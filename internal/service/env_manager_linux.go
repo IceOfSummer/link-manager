@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"github.com/link-manager/internal/configuration"
+	"github.com/symbolic-link-manager/internal/configuration"
 )
 
 func AddEnvDeclarition(declarationName string) {

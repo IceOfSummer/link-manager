@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/link-manager/internal/configuration"
+	"github.com/symbolic-link-manager/internal/configuration"
 
 	"github.com/spf13/cobra"
 )

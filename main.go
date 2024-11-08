@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/link-manager/cmd"
+	"github.com/symbolic-link-manager/cmd"
 )
 
 func main() {

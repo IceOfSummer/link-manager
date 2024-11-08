@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/link-manager/internal/configuration"
-	"github.com/link-manager/internal/logger/displayer"
+	"github.com/symbolic-link-manager/internal/configuration"
+	"github.com/symbolic-link-manager/internal/logger/displayer"
 
 	"github.com/spf13/cobra"
 )

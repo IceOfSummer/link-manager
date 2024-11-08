@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/link-manager/internal/configuration"
+	"github.com/symbolic-link-manager/internal/configuration"
 )
 
 func DisplayLinks(links ...configuration.Link) {

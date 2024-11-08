@@ -4,7 +4,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/link-manager/internal/localizer"
+	"github.com/symbolic-link-manager/internal/localizer"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
