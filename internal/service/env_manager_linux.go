@@ -5,7 +5,7 @@ import (
 )
 
 func AddEnvDeclarition(declarationName string) {
-	configuration.AddEnvDeclarition(declarationName)
+	configuration.AddEnvDeclaration(declarationName)
 }
 
 func AddEnvValue() {

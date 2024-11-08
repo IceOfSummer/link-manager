@@ -14,7 +14,7 @@ const appDirectory = "app"
 // 使用当前链接.
 // 返回所有设置的链接，包括间接连接的。
 func UseLink(link *Link) []Link {
-	holder := filepath.FromSlash(path.Join(DENV_HOME, appDirectory))
+	holder := filepath.FromSlash(path.Join(APP_HOME, appDirectory))
 	_, err := os.Stat(holder)
 	if os.IsNotExist(err) {
 		logger.LogDebug("Creating 'app' directory.")
@@ -41,12 +41,12 @@ func UseLink(link *Link) []Link {
 	}
 
 	// use all binds
-	binds := ListBinds(&LinkBindItem{Name: link.Name, Alias: link.Alias})
+	binds := ListBinds(&LinkBindItem{TargetName: link.Name, TargetAlias: link.Alias})
 
 	result := make([]Link, 0)
 	result = append(result, *link)
 	for _, v := range binds {
-		result = append(result, UseLink(FindEnvByNameAndAlias(v.Name, v.Alias))...)
+		result = append(result, UseLink(FindLinkByNameAndAlias(v.TargetName, v.TargetAlias))...)
 	}
 	return result
 }
@@ -57,7 +57,7 @@ type UsingLink struct {
 }
 
 func ListUsing() ([]UsingLink, error) {
-	base := path.Join(DENV_HOME, "app")
+	base := path.Join(APP_HOME, "app")
 	entries, err := os.ReadDir(base)
 	logger.LogDebug("Searching " + base)
 	if err != nil {

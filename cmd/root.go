@@ -8,12 +8,18 @@ import (
 	"github.com/symbolic-link-manager/internal/logger"
 )
 
+const longDoc = `一个管理软连接的工具，通常用于快速切换工具 SDK 版本。
+
+完整文档: https://github.com/IceOfSummer/symbolic-link-manager
+`
+
 var rootCmd = &cobra.Command{
-	Use:   "hugo",
-	Short: "Hugo is a very fast static site generator",
-	Long: `A Fast and Flexible Static Site Generator built with
-				  love by spf13 and friends in Go.
-				  Complete documentation is available at http://hugo.spf13.com`,
+	Use:   "slm",
+	Short: "symbolic-link-manager 是一个管理系统软连接的工具",
+	Long:  longDoc,
+	CompletionOptions: cobra.CompletionOptions{
+		DisableDefaultCmd: true,
+	},
 }
 
 func init() {
@@ -25,8 +31,4 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-}
-
-func LogError(msg string) {
-	fmt.Printf("错误: %s\n", msg)
 }

@@ -7,4 +7,4 @@ short = "添加动态环境变量"
 long = ""
 
 [error]
-noenv = "请在使用前先设置 `DENV_HOME`。"
+noenv = "请在使用前先设置 `SLINK_MANAGER_HOME`。"

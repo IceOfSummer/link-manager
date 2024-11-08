@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/symbolic-link-manager/internal/logger"
 	"strings"
 
 	"github.com/symbolic-link-manager/internal/configuration"
@@ -11,12 +12,14 @@ import (
 )
 
 // 分割字符串中的冒号
-func splitVersion(nameWithVersion string) (*configuration.LinkBindItem, error) {
+//
+// 返回: (Name Alias error)
+func splitVersion(nameWithVersion string) (string, string, error) {
 	sp := strings.Split(nameWithVersion, ":")
 	if len(sp) != 2 {
-		return nil, errors.New("` " + nameWithVersion + "` 存在多个 `:`，无法解析别名!")
+		return "", "", errors.New("` " + nameWithVersion + "` 存在多个 `:`，无法解析别名!")
 	}
-	return &configuration.LinkBindItem{Name: sp[0], Alias: sp[1]}, nil
+	return sp[0], sp[1], nil
 }
 
 func init() {
@@ -31,7 +34,7 @@ func init() {
 		Short: "声明一个链接",
 		Long:  "声明一个链接，仅声明，没有具体的值",
 		Run: func(cmd *cobra.Command, args []string) {
-			configuration.AddEnvDeclarition(args[0])
+			configuration.AddEnvDeclaration(args[0])
 			fmt.Println("添加了新的环境变量声明: " + args[0])
 		},
 		Args: cobra.ExactArgs(1),
@@ -49,7 +52,7 @@ func init() {
 				Path:  args[2],
 			})
 			if err != nil {
-				LogError("环境变量或别名不存在!")
+				logger.LogError(err)
 				return
 			}
 			fmt.Println("设置成功!")
@@ -63,25 +66,24 @@ func init() {
 		Long:  "单向绑定两个链接，当切换到 `LINK_NAME:ALIAS` 后会自动切换到 `TARGET_LINK_NAME:ALIAS`",
 		Run: func(cmd *cobra.Command, args []string) {
 			// errors were checked in Args function.
-			src, _ := splitVersion(args[0])
-			target, _ := splitVersion(args[1])
-			configuration.AddLink(src, target)
-			fmt.Println("Bound: " + src.Name + ":" + src.Alias + " ==>" + target.Name + ":" + target.Alias)
-		},
-		Args: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 2 {
-				return errors.New("需要 2 个参数，但是提供了" + string(len(args)) + "个")
-			}
-			_, err := splitVersion(args[0])
+			srcName, srcAlias, err := splitVersion(args[0])
 			if err != nil {
-				return err
+				logger.LogError(err)
+				return
 			}
-			_, err = splitVersion(args[1])
+			targetName, targetAlias, err := splitVersion(args[1])
 			if err != nil {
-				return err
+				logger.LogError(err)
+				return
 			}
-			return nil
+			err = configuration.AddBind(srcName, srcAlias, targetName, targetAlias)
+			if err != nil {
+				logger.LogError(err)
+				return
+			}
+			fmt.Println("Bound: " + srcName + ":" + srcAlias + " ==>" + targetName + ":" + targetAlias)
 		},
+		Args: cobra.ExactArgs(2),
 	}
 
 	addCommand.AddCommand(envAddCommand)

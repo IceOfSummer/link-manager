@@ -15,9 +15,9 @@ func init() {
 		Short: "使用环境变量",
 		Long:  "使用特定的环境变量",
 		Run: func(cmd *cobra.Command, args []string) {
-			env := configuration.FindEnvByNameAndAlias(args[0], args[1])
+			env := configuration.FindLinkByNameAndAlias(args[0], args[1])
 			if env == nil {
-				LogError("链接或别名不存在")
+				fmt.Println("链接或别名不存在")
 				return
 			}
 			r := configuration.UseLink(env)

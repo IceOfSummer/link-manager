@@ -10,3 +10,7 @@ func LogDebug(msg string) {
 		fmt.Println("[DEBUG] " + msg)
 	}
 }
+
+func LogError(err error) {
+	fmt.Println(err.Error())
+}
