@@ -13,7 +13,7 @@ import (
 
 // 分割字符串中的冒号
 //
-// 返回: (Name Alias error)
+// 返回: (Name Tag error)
 func splitVersion(nameWithVersion string) (string, string, error) {
 	sp := strings.Split(nameWithVersion, ":")
 	if len(sp) != 2 {
@@ -53,15 +53,14 @@ func init() {
 	}
 	var envValueAddCommand = &cobra.Command{
 		Use:     localizer.GetMessageWithoutParam(localizer.CommandAddLKVUse),
-		Aliases: []string{"lkv"},
 		Short:   localizer.GetMessageWithoutParam(localizer.CommandAddLKVShort),
 		Long:    localizer.GetMessageWithoutParam(localizer.CommandAddLKVLong),
-		Example: `  slm add link-value java 17 "C:\Program Files\Java\jdk-17.0.12+7"`,
+		Example: `  slm add tag java 17 "C:\Program Files\Java\jdk-17.0.12+7"`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := configuration.AddEnvValue(&configuration.Link{
-				Name:  args[0],
-				Alias: args[1],
-				Path:  args[2],
+				Name: args[0],
+				Tag:  args[1],
+				Path: args[2],
 			})
 			if err != nil {
 				return err

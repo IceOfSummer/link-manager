@@ -25,7 +25,7 @@ func init() {
 					MessageID: localizer.CommandUseSuccess,
 					TemplateData: map[string]string{
 						"LinkName": v.Name,
-						"Tag":      v.Alias,
+						"Tag":      v.Tag,
 					},
 				}))
 			}

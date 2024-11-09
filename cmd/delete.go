@@ -33,11 +33,10 @@ func init() {
 	}
 
 	var deleteLinkValue = &cobra.Command{
-		Use:     localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVUse),
-		Aliases: []string{"lkv"},
-		Short:   localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVShort),
-		Long:    localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVLong),
-		Args:    cobra.MinimumNArgs(1),
+		Use:   localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVUse),
+		Short: localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVShort),
+		Long:  localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVLong),
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			deleted := configuration.DeleteLink(args[0], "")
 			if len(deleted) == 0 {
@@ -63,9 +62,9 @@ func init() {
 				return err
 			}
 			item := configuration.LinkBindItem{
-				CurrentAlias: srcAlias,
-				TargetName:   targetName,
-				TargetAlias:  targetAlias,
+				CurrentTag:  srcAlias,
+				TargetName:  targetName,
+				TargetAlias: targetAlias,
 			}
 			result := configuration.DeleteBind(srcName, &item)
 			if result {

@@ -12,7 +12,7 @@ func SetUpTestEnvironment() {
 	_, filename, _, _ := runtime.Caller(0)
 	root := path.Dir(path.Join(filename, ".."))
 
-	err := os.Setenv(configuration.APP_HOME_ENV_KEY, path.Join(root, "tmp"))
+	err := os.Setenv(configuration.AppHomeEnvKey, path.Join(root, "tmp"))
 	if err != nil {
 		panic(err)
 	}

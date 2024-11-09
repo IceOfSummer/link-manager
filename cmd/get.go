@@ -27,9 +27,8 @@ func init() {
 	}
 
 	var getEnvValue = &cobra.Command{
-		Use:     localizer.GetMessageWithoutParam(localizer.CommandGetLKVUse),
-		Short:   localizer.GetMessageWithoutParam(localizer.CommandGetLKVShort),
-		Aliases: []string{"lkv"},
+		Use:   localizer.GetMessageWithoutParam(localizer.CommandGetLKVUse),
+		Short: localizer.GetMessageWithoutParam(localizer.CommandGetLKVShort),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
 				displayer.DisplayLinks(configuration.ListLinkValues("")...)

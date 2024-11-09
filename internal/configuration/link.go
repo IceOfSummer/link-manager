@@ -41,7 +41,7 @@ func UseLink(link *Link) []Link {
 	}
 
 	// use all binds
-	binds := ListBinds(&LinkBindItem{TargetName: link.Name, TargetAlias: link.Alias})
+	binds := ListBinds(&LinkBindItem{TargetName: link.Name, TargetAlias: link.Tag})
 
 	result := make([]Link, 0)
 	result = append(result, *link)

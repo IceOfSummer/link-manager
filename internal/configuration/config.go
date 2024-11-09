@@ -8,14 +8,14 @@ import (
 )
 
 var lazyLoadAppHome string
-var APP_HOME_ENV_KEY = "SLINK_MANAGER_HOME"
+var AppHomeEnvKey = "SLINK_MANAGER_HOME"
 
 // AppHome 获取 lazyLoadAppHome
 func AppHome() string {
 	if lazyLoadAppHome != "" {
 		return lazyLoadAppHome
 	}
-	home, ok := os.LookupEnv(APP_HOME_ENV_KEY)
+	home, ok := os.LookupEnv(AppHomeEnvKey)
 	if !ok {
 		panic(localizer.GetMessage(&i18n.LocalizeConfig{MessageID: "error.noenv"}))
 	}
@@ -29,25 +29,25 @@ func init() {
 type Link struct {
 	// 链接名称
 	Name string
-	// 链接别名
-	Alias string
+	// 链接标签
+	Tag string
 	// 链接路径
 	Path string
 }
 
 func (t Link) String() string {
-	return t.Name + ":" + t.Alias
+	return t.Name + ":" + t.Tag
 }
 
 // LinkBindItem 一个链接绑定.
 //
 // 首先由 [BindsData] 获取到 [Link.Name]. 之后即可创建一个完整的链接:
 //
-// [BindsData].key : [LinkBindItem.CurrentAlias] ==> [LinkBindItem.TargetName] : [LinkBindItem.TargetAlias]
+// [BindsData].key : [LinkBindItem.CurrentTag] ==> [LinkBindItem.TargetName] : [LinkBindItem.TargetAlias]
 type LinkBindItem struct {
-	CurrentAlias string
-	TargetName   string
-	TargetAlias  string
+	CurrentTag  string
+	TargetName  string
+	TargetAlias string
 }
 
 func (t LinkBindItem) String() string {

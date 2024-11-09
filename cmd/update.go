@@ -39,15 +39,14 @@ func createUpdateLinkValueCmd() *cobra.Command {
 	var newTag *string
 	var newPath *string
 	var updateLinkCmd = &cobra.Command{
-		Use:     localizer.GetMessageWithoutParam(localizer.CommandUpdateLKVUse),
-		Aliases: []string{"lkv"},
-		Short:   localizer.GetMessageWithoutParam(localizer.CommandUpdateLKVShort),
+		Use:   localizer.GetMessageWithoutParam(localizer.CommandUpdateLKVUse),
+		Short: localizer.GetMessageWithoutParam(localizer.CommandUpdateLKVShort),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			changedCnt := 0
 			var updateEntity configuration.Link
 			if newTag != nil && *newTag != "" {
 				changedCnt++
-				updateEntity.Alias = *newTag
+				updateEntity.Tag = *newTag
 			}
 			if newPath != nil && *newPath != "" {
 				changedCnt++

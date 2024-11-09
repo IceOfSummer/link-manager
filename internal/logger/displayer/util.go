@@ -17,7 +17,7 @@ func DisplayLinks(links ...configuration.Link) {
 	for _, v := range links {
 		builder.WriteString(v.Name)
 		builder.WriteString(":")
-		builder.WriteString(v.Alias)
+		builder.WriteString(v.Tag)
 		builder.WriteString(" => ")
 		builder.WriteString(v.Path)
 		builder.WriteString("\n")

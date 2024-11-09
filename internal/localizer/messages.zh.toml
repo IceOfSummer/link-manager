@@ -7,7 +7,7 @@ link_short = "声明一个链接"
 link_long = "声明一个链接，仅声明，没有具体的值"
 link_add_success = "添加了新的链接声明: {{ .LinkName }}"
 
-lkv_use = "link-value 链接名称 标签 路径"
+lkv_use = "tag 链接名称 标签 路径"
 lkv_short = "给链接添加一个值"
 lkv_long = "给链接添加一个值(链接需要提前声明)，在添加时请注意路径之间的空格，如果路径之间有空格，则需要用双引号包裹"
 
@@ -23,7 +23,7 @@ long = "删除特定的资源"
 link_use = "link 链接名称"
 link_short = "删除链接定义"
 
-lkv_use = "link-value 链接名称 [标签]"
+lkv_use = "tag 链接名称 [标签]"
 lkv_short = "删除链接的值"
 lkv_long = "删除链接的值，如果不提供标签，则删除整个链接"
 
@@ -35,7 +35,7 @@ short = "列出指定资源"
 
 links_short = "列出所有声明的链接"
 
-lkv_use = "link-values [链接名称]"
+lkv_use = "tags [链接名称]"
 lkv_short = "列出所有链接的值"
 
 bind_use = "bind ([链接名称] [链接别名])"
@@ -58,7 +58,7 @@ long = "更新特定资源"
 link_use = "link 链接名称"
 link_short = "更新链接声明"
 
-lkv_use = "link-value 链接名称 标签"
+lkv_use = "tag 链接名称 标签"
 lkv_short = "更新链接的值"
 
 bind_use = "bind 链接名称:标签 目标链接名称:目标标签"

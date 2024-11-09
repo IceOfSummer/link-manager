@@ -109,9 +109,9 @@ func AddBind(srcName, srcAlias, targetName, targetAlias string) error {
 	old, ok := config.Binds[srcName]
 
 	entity := LinkBindItem{
-		CurrentAlias: srcAlias,
-		TargetName:   targetName,
-		TargetAlias:  targetAlias,
+		CurrentTag:  srcAlias,
+		TargetName:  targetName,
+		TargetAlias: targetAlias,
 	}
 	if ok {
 		config.Binds[srcName] = append(old, entity)
@@ -146,7 +146,7 @@ func ListLinkValues(name string) []Link {
 func FindLinkByNameAndAlias(name, alias string) *Link {
 	envs := ListLinkValues(name)
 	for _, v := range envs {
-		if v.Alias == alias {
+		if v.Tag == alias {
 			return &v
 		}
 	}
@@ -194,7 +194,7 @@ func DeleteLink(linkName, alias string) []Link {
 			newLinks = append(newLinks, link)
 			continue
 		}
-		if alias == "" || link.Alias == alias {
+		if alias == "" || link.Tag == alias {
 			deleted = append(deleted, link)
 			continue
 		}
@@ -219,7 +219,7 @@ func DeleteBind(rootLinkName string, linkBindItem *LinkBindItem) bool {
 	for i, item := range result {
 		if item.TargetName == linkBindItem.TargetName &&
 			item.TargetAlias == linkBindItem.TargetAlias &&
-			item.CurrentAlias == linkBindItem.CurrentAlias {
+			item.CurrentTag == linkBindItem.CurrentTag {
 			result = append(result[:i], result[i+1:]...)
 			config.Binds[rootLinkName] = result
 			saveConfig(&config)
@@ -265,8 +265,8 @@ func UpdateLinkValue(name, alias string, updateEntity Link) error {
 	if link == nil {
 		return errors.New("链接不存在")
 	}
-	if updateEntity.Alias != "" {
-		link.Alias = updateEntity.Alias
+	if updateEntity.Tag != "" {
+		link.Tag = updateEntity.Tag
 	}
 	if updateEntity.Path != "" {
 		link.Path = updateEntity.Path
