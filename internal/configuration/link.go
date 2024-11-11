@@ -1,4 +1,4 @@
-// 设置环境变量的实现.
+// Package configuration 设置环境变量的实现.
 package configuration
 
 import (
@@ -11,10 +11,10 @@ import (
 
 const appDirectory = "app"
 
-// 使用当前链接.
+// UseLink 使用当前链接.
 // 返回所有设置的链接，包括间接连接的。
 func UseLink(link *Link) []Link {
-	holder := filepath.FromSlash(path.Join(APP_HOME, appDirectory))
+	holder := filepath.FromSlash(path.Join(AppHome(), appDirectory))
 	_, err := os.Stat(holder)
 	if os.IsNotExist(err) {
 		logger.LogDebug("Creating 'app' directory.")
@@ -57,7 +57,7 @@ type UsingLink struct {
 }
 
 func ListUsing() ([]UsingLink, error) {
-	base := path.Join(APP_HOME, "app")
+	base := path.Join(AppHome(), "app")
 	entries, err := os.ReadDir(base)
 	logger.LogDebug("Searching " + base)
 	if err != nil {

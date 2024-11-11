@@ -1,10 +1,89 @@
-[init]
-short = "初始化 jvs"
-long = "将指定目录指定为数据目录，所有的数据将存放在该目录中。"
+[command.add]
+short = "添加资源"
+long = "添加特定的资源"
 
-[add]
-short = "添加动态环境变量"
-long = ""
+link_use = "link 链接名称"
+link_short = "声明一个链接"
+link_long = "声明一个链接，仅声明，没有具体的值"
+link_add_success = "添加了新的链接声明: {{ .LinkName }}"
+
+lkv_use = "link-value 链接名称 标签 路径"
+lkv_short = "给链接添加一个值"
+lkv_long = "给链接添加一个值(链接需要提前声明)，在添加时请注意路径之间的空格，如果路径之间有空格，则需要用双引号包裹"
+
+bind_use = "bind 链接名称:标签 目标链接名称:目标标签"
+bind_short = "单选绑定两个链接"
+bind_long = "单向绑定两个链接，当切换到 `链接名称:标签名称` 后会自动切换到 `目标链接名称:目标标签别名`"
+bind_success = "绑定成功: {{ .SrcName }}:{{ .SrcTag }} ==> {{ .TargetName }}:{{ .TargetTag }}"
+
+[command.delete]
+short = "删除资源"
+long = "删除特定的资源"
+
+link_use = "link 链接名称"
+link_short = "删除链接定义"
+
+lkv_use = "link-value 链接名称 [标签]"
+lkv_short = "删除链接的值"
+lkv_long = "删除链接的值，如果不提供标签，则删除整个链接"
+
+bind_use = "bind 链接名称:标签 目标链接名称:目标链接标签"
+bind_short = "删除链接绑定"
+
+[command.get]
+short = "列出指定资源"
+
+links_short = "列出所有声明的链接"
+
+lkv_use = "link-values [链接名称]"
+lkv_short = "列出所有链接的值"
+
+bind_use = "bind ([链接名称] [链接别名])"
+bind_short = "获取链接所有的绑定"
+
+using_short = "获取当前所有正在使用的链接"
+
+[command.root]
+short = "symbolic-link-manager 是一个管理系统软连接的工具"
+long ="""
+一个管理软连接的工具，通常用于快速切换工具 SDK 版本。
+
+完整文档: https://github.com/IceOfSummer/symbolic-link-manager
+"""
+
+[command.update]
+short = "更新资源"
+long = "更新特定资源"
+
+link_use = "link 链接名称"
+link_short = "更新链接声明"
+
+lkv_use = "link-value 链接名称 标签"
+lkv_short = "更新链接的值"
+
+bind_use = "bind 链接名称:标签 目标链接名称:目标标签"
+bind_short = "更新绑定"
+
+[command.update.flag]
+name = "想要更新的名称"
+path = "新的路径"
+tag = "新的标签"
+
+[command.use]
+use = "use 链接名称 标签"
+short = "使用环境变量"
+success = "切换为: {{ .LinkName }}:{{ .Tag }}"
 
 [error]
 noenv = "请在使用前先设置 `SLINK_MANAGER_HOME`。"
+invalid_name_mark_pair = "`{{ .Raw }}` 存在多个 `:`，无法解析别名!"
+no_such_link = "没有找到对应的链接定义: {{ .LinkName }}"
+no_such_link_value = "没有找到对应的链接: {{ .LinkName }}:{{ .Tag }}"
+no_such_bind = "指定的绑定不存在"
+
+
+[message]
+update_success = "设置成功"
+delete_success_prefix = "已删除: "
+nothing_changed = "没有任何资源被修改"
+nothing_found = "没有找到对应的资源"

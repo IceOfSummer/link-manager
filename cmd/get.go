@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/symbolic-link-manager/internal/localizer"
 	"strings"
 
 	"github.com/symbolic-link-manager/internal/configuration"
@@ -13,13 +14,12 @@ import (
 func init() {
 	var getCommand = &cobra.Command{
 		Use:   "get",
-		Short: "列出指定资源",
-		Long:  "列出指定资源",
+		Short: localizer.GetMessageWithoutParam(localizer.CommandGetShort),
 	}
 
-	var getEnv = &cobra.Command{
+	var getLinks = &cobra.Command{
 		Use:   "links",
-		Short: "列出所有声明的链接",
+		Short: localizer.GetMessageWithoutParam(localizer.CommandGetLinksShort),
 		Run: func(cmd *cobra.Command, args []string) {
 			names := configuration.ListLinkNames()
 			fmt.Print(strings.Join(names, "\n"))
@@ -27,8 +27,8 @@ func init() {
 	}
 
 	var getEnvValue = &cobra.Command{
-		Use:     "link-values [LINK_NAME]",
-		Short:   "列出所有链接的值",
+		Use:     localizer.GetMessageWithoutParam(localizer.CommandGetLKVUse),
+		Short:   localizer.GetMessageWithoutParam(localizer.CommandGetLKVShort),
 		Aliases: []string{"lkv"},
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
@@ -40,8 +40,8 @@ func init() {
 	}
 
 	var getBound = &cobra.Command{
-		Use:   "bind ([LINK_NAME] [LINK_ALIAS])",
-		Short: "获取链接所有的绑定",
+		Use:   localizer.GetMessageWithoutParam(localizer.CommandGetBindUse),
+		Short: localizer.GetMessageWithoutParam(localizer.CommandGetBindShort),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
 				binds := configuration.GetAllBinds()
@@ -56,24 +56,23 @@ func init() {
 				TargetAlias: args[1],
 			}
 			result := configuration.ListBinds(root)
-			displayer.DisplayBinds(root, result...)
+			displayer.DisplayBindsWithStringRoot(args[0], result...)
 		},
 	}
 
 	var getUsing = &cobra.Command{
 		Use:   "using",
-		Short: "获取所有当前正在使用的链接",
+		Short: localizer.GetMessageWithoutParam(localizer.CommandGetUsing),
 		Run: func(cmd *cobra.Command, args []string) {
 			using, err := configuration.ListUsing()
 			if err != nil {
 				panic(err)
 			}
 			displayer.DisplayUsingLink(using)
-
 		},
 	}
 
-	getCommand.AddCommand(getEnv)
+	getCommand.AddCommand(getLinks)
 	getCommand.AddCommand(getEnvValue)
 	getCommand.AddCommand(getBound)
 	getCommand.AddCommand(getUsing)

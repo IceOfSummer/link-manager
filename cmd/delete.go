@@ -5,61 +5,76 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/symbolic-link-manager/internal"
 	"github.com/symbolic-link-manager/internal/configuration"
-	"github.com/symbolic-link-manager/internal/logger"
+	"github.com/symbolic-link-manager/internal/localizer"
+	"github.com/symbolic-link-manager/internal/logger/displayer"
 )
 
 func init() {
 
 	var deleteCommand = &cobra.Command{
 		Use:   "delete",
-		Short: "删除资源。",
-		Long:  "删除特定的资源。",
+		Short: localizer.GetMessageWithoutParam(localizer.CommandDeleteShort),
+		Long:  localizer.GetMessageWithoutParam(localizer.CommandDeleteLong),
 	}
 
 	var deleteLink = &cobra.Command{
-		Use:   "link LINK_NAME",
-		Short: "删除链接定义",
+		Use:   localizer.GetMessageWithoutParam(localizer.CommandDeleteLinkUse),
+		Short: localizer.GetMessageWithoutParam(localizer.CommandDeleteLinkShort),
 		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			configuration.DeleteLink(args[0], "")
+		RunE: func(cmd *cobra.Command, args []string) error {
+			deleted := configuration.DeleteLink(args[0], "")
+			if len(deleted) == 0 {
+				return localizer.CreateNoSuchLinkError(args[0])
+			}
+			fmt.Println(localizer.GetMessageWithoutParam(localizer.MessageDeleteSuccessPrefix))
+			displayer.DisplayLinks(deleted...)
+			return nil
 		},
 	}
 
 	var deleteLinkValue = &cobra.Command{
-		Use:     "link-value LINK_NAME [ALIAS]",
+		Use:     localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVUse),
 		Aliases: []string{"lkv"},
-		Short:   "删除链接的值",
+		Short:   localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVShort),
+		Long:    localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVLong),
 		Args:    cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			configuration.DeleteLink(args[0], args[1])
+		RunE: func(cmd *cobra.Command, args []string) error {
+			deleted := configuration.DeleteLink(args[0], "")
+			if len(deleted) == 0 {
+				return localizer.CreateNoSuchLinkError(args[0])
+			}
+			fmt.Println(localizer.GetMessageWithoutParam(localizer.MessageDeleteSuccessPrefix))
+			displayer.DisplayLinks(deleted...)
+			return nil
 		},
 	}
 
 	var deleteBind = &cobra.Command{
-		Use:   "bind LINK_NAME:ALIAS TARGET_LINK_NAME:ALIAS",
-		Short: "删除链接绑定",
+		Use:   localizer.GetMessageWithoutParam(localizer.CommandDeleteBindUse),
+		Short: localizer.GetMessageWithoutParam(localizer.CommandDeleteBindShort),
 		Args:  cobra.ExactArgs(2),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			srcName, srcAlias, err := internal.SplitVersion(args[0])
 			if err != nil {
-				logger.LogError(err)
-				return
+				return err
 			}
 			targetName, targetAlias, err := internal.SplitVersion(args[1])
 			if err != nil {
-				logger.LogError(err)
-				return
+				return err
 			}
-			result := configuration.DeleteBind(srcName, &configuration.LinkBindItem{
+			item := configuration.LinkBindItem{
 				CurrentAlias: srcAlias,
 				TargetName:   targetName,
 				TargetAlias:  targetAlias,
-			})
-			if result {
-				fmt.Printf("删除成功")
-			} else {
-				fmt.Println("指定的绑定不存在")
 			}
+			result := configuration.DeleteBind(srcName, &item)
+			if result {
+				fmt.Println(localizer.GetMessageWithoutParam(localizer.MessageDeleteSuccessPrefix))
+				displayer.DisplayBindsWithStringRoot(srcName, item)
+			} else {
+				return localizer.CreateNoSuchBindError()
+			}
+			return nil
 		},
 	}
 

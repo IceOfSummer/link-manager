@@ -5,15 +5,27 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 )
 
 var cache *configuration = nil
+var lazyLoadConfigPath string
+
+func getConfigPath() string {
+	if lazyLoadConfigPath != "" {
+		return lazyLoadConfigPath
+	}
+	p := path.Join(AppHome(), "configuration.json")
+	lazyLoadConfigPath = p
+	return p
+}
 
 // 读取配置文件
 func readConfig() configuration {
 	if cache != nil {
 		return *cache
 	}
+	configFilePath := getConfigPath()
 	_, err := os.Stat(configFilePath)
 	if os.IsNotExist(err) {
 		return configuration{
@@ -37,13 +49,17 @@ func readConfig() configuration {
 }
 
 func saveConfig(configuration *configuration) {
+	configFilePath := getConfigPath()
 	cache = configuration
 	content, err := json.Marshal(configuration)
 	if err != nil {
 		fmt.Println("Failed to save json config.")
 		panic(err)
 	}
-	os.WriteFile(configFilePath, content, 0b110_110_100)
+	err = os.WriteFile(configFilePath, content, 0b110_110_100)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // AddEnvDeclaration 添加一个环境变量声明
@@ -166,23 +182,28 @@ func rebuildDeclaredLinks(links []Link) []string {
 
 // DeleteLink 删除链接.
 // 如果不提供第二个参数, 则删除全部.
-func DeleteLink(linkName, alias string) {
+// 返回被删除的元素
+func DeleteLink(linkName, alias string) []Link {
 	config := readConfig()
 
 	var newLinks []Link
+	var deleted []Link
+
 	for _, link := range config.Links {
 		if link.Name != linkName {
 			newLinks = append(newLinks, link)
 			continue
 		}
-		if alias != "" && link.Alias != alias {
-			newLinks = append(newLinks, link)
+		if alias == "" || link.Alias == alias {
+			deleted = append(deleted, link)
 			continue
 		}
+		newLinks = append(newLinks, link)
 	}
 	newDeclaredLinkNames := rebuildDeclaredLinks(newLinks)
 	config.Links = newLinks
 	config.DeclaredLinkNames = newDeclaredLinkNames
+	return deleted
 }
 
 // DeleteBind 删除对应的绑定.

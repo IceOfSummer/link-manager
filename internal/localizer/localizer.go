@@ -19,6 +19,8 @@ var localZhFs embed.FS
 //go:embed messages.en.toml
 var localEnFs embed.FS
 
+var localizer *i18n.Localizer
+
 func init() {
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	_, err := bundle.LoadMessageFileFS(localZhFs, "messages.zh.toml")
@@ -29,6 +31,8 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+
+	localizer = i18n.NewLocalizer(bundle, getLocale())
 }
 
 // 获取当前语言.
@@ -48,11 +52,13 @@ func getLocale() string {
 	return "en_US"
 }
 
-func GetLocalizer() *i18n.Localizer {
-	return i18n.NewLocalizer(bundle, getLocale())
+func GetMessageWithoutParam(key string) string {
+	return GetMessage(&i18n.LocalizeConfig{
+		MessageID: string(key),
+	})
 }
 
-func LocalizeAndIgnoreError(localizer *i18n.Localizer, config *i18n.LocalizeConfig) string {
+func GetMessage(config *i18n.LocalizeConfig) string {
 	r, err := localizer.Localize(config)
 	if err == nil {
 		return r
@@ -60,6 +66,10 @@ func LocalizeAndIgnoreError(localizer *i18n.Localizer, config *i18n.LocalizeConf
 	return config.MessageID
 }
 
-func GetMessageAndIgnoreError(config *i18n.LocalizeConfig) string {
-	return LocalizeAndIgnoreError(GetLocalizer(), config)
+type LocalizedError struct {
+	Config *i18n.LocalizeConfig
+}
+
+func (e LocalizedError) Error() string {
+	return GetMessage(e.Config)
 }

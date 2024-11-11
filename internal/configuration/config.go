@@ -1,24 +1,29 @@
 package configuration
 
 import (
-	"os"
-	"path"
-
 	"github.com/symbolic-link-manager/internal/localizer"
+	"os"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
-var APP_HOME string
-var configFilePath string
+var lazyLoadAppHome string
+var APP_HOME_ENV_KEY = "SLINK_MANAGER_HOME"
+
+// AppHome 获取 lazyLoadAppHome
+func AppHome() string {
+	if lazyLoadAppHome != "" {
+		return lazyLoadAppHome
+	}
+	home, ok := os.LookupEnv(APP_HOME_ENV_KEY)
+	if !ok {
+		panic(localizer.GetMessage(&i18n.LocalizeConfig{MessageID: "error.noenv"}))
+	}
+	lazyLoadAppHome = home
+	return home
+}
 
 func init() {
-	home, ok := os.LookupEnv("SLINK_MANAGER_HOME")
-	if !ok {
-		panic(localizer.GetMessageAndIgnoreError(&i18n.LocalizeConfig{MessageID: "error.noenv"}))
-	}
-	APP_HOME = home
-	configFilePath = path.Join(home, "configuration.json")
 }
 
 type Link struct {

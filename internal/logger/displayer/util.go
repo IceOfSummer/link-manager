@@ -2,6 +2,7 @@ package displayer
 
 import (
 	"fmt"
+	"github.com/symbolic-link-manager/internal/localizer"
 	"strings"
 
 	"github.com/symbolic-link-manager/internal/configuration"
@@ -9,7 +10,7 @@ import (
 
 func DisplayLinks(links ...configuration.Link) {
 	if len(links) == 0 {
-		fmt.Println("没有找到对应的链接")
+		fmt.Println(localizer.GetMessageWithoutParam(localizer.NothingFound))
 		return
 	}
 	var builder strings.Builder
@@ -26,7 +27,7 @@ func DisplayLinks(links ...configuration.Link) {
 
 func DisplayBindsWithStringRoot(root string, binds ...configuration.LinkBindItem) {
 	if len(binds) == 0 {
-		fmt.Println("没有找到对应的绑定")
+		fmt.Println(localizer.GetMessageWithoutParam(localizer.NothingFound))
 		return
 	}
 	var builder strings.Builder
@@ -40,13 +41,9 @@ func DisplayBindsWithStringRoot(root string, binds ...configuration.LinkBindItem
 	fmt.Print(builder.String())
 }
 
-func DisplayBinds(root *configuration.LinkBindItem, binds ...configuration.LinkBindItem) {
-	DisplayBindsWithStringRoot(root.String(), binds...)
-}
-
 func DisplayUsingLink(links []configuration.UsingLink) {
 	if len(links) == 0 {
-		fmt.Println("没有正在使用的链接")
+		fmt.Println(localizer.GetMessageWithoutParam(localizer.NothingFound))
 		return
 	}
 	var builder strings.Builder

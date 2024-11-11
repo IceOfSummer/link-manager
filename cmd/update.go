@@ -5,63 +5,67 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/symbolic-link-manager/internal"
 	"github.com/symbolic-link-manager/internal/configuration"
-	"github.com/symbolic-link-manager/internal/logger"
+	"github.com/symbolic-link-manager/internal/localizer"
 )
 
 func createUpdateLinkDeclareCmd() *cobra.Command {
 	var newLinkName *string
 
 	var updateLinkDeclareCmd = &cobra.Command{
-		Use: "link LINK_NAME",
-		Run: func(cmd *cobra.Command, args []string) {
+		Use:   localizer.GetMessageWithoutParam(localizer.CommandUpdateLinkUse),
+		Short: localizer.GetMessageWithoutParam(localizer.CommandUpdateLinkShort),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if newLinkName == nil || *newLinkName == "" {
-				fmt.Println("未修改任何字段.")
-				return
+				return localizer.CreateError(localizer.NothingChanged)
 			}
 			err := configuration.RenameLinkDeclaration(args[0], *newLinkName)
 			if err != nil {
-				logger.LogError(err)
-				return
+				return err
 			}
 			fmt.Printf(*newLinkName)
+			return nil
 		},
 	}
-	newLinkName = updateLinkDeclareCmd.Flags().String("name", "", "想要更新的名称")
+	newLinkName = updateLinkDeclareCmd.Flags().String(
+		"name",
+		"",
+		localizer.GetMessageWithoutParam(localizer.UpdateFlagName),
+	)
 
 	return updateLinkDeclareCmd
 }
 
 func createUpdateLinkValueCmd() *cobra.Command {
-	var newAlias *string
+	var newTag *string
 	var newPath *string
 	var updateLinkCmd = &cobra.Command{
-		Use:     "link-value LINK_NAME ALIAS",
+		Use:     localizer.GetMessageWithoutParam(localizer.CommandUpdateLKVUse),
 		Aliases: []string{"lkv"},
-		Run: func(cmd *cobra.Command, args []string) {
+		Short:   localizer.GetMessageWithoutParam(localizer.CommandUpdateLKVShort),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			changedCnt := 0
 			var updateEntity configuration.Link
-			if newAlias != nil && *newAlias != "" {
+			if newTag != nil && *newTag != "" {
 				changedCnt++
-				updateEntity.Alias = *newAlias
+				updateEntity.Alias = *newTag
 			}
 			if newPath != nil && *newPath != "" {
 				changedCnt++
 				updateEntity.Path = *newPath
 			}
 			if changedCnt == 0 {
-				fmt.Println("未修改任何字段.")
-				return
+				return localizer.CreateError(localizer.NothingChanged)
 			}
 			err := configuration.UpdateLinkValue(args[0], args[1], updateEntity)
 			if err != nil {
-				logger.LogError(err)
-				return
+				return err
 			}
+			return nil
 		},
 		Args: cobra.ExactArgs(2),
 	}
-	newPath = updateLinkCmd.Flags().String("path", "", "新的路径")
-	newAlias = updateLinkCmd.Flags().String("alias", "", "新的别名, 将会同步更新绑定.")
+	newPath = updateLinkCmd.Flags().String("path", "", localizer.GetMessageWithoutParam(localizer.UpdateFlagPath))
+	newTag = updateLinkCmd.Flags().String("tag", "", localizer.GetMessageWithoutParam(localizer.UpdateFlagTag))
 
 	return updateLinkCmd
 }
@@ -71,17 +75,16 @@ func createUpdateBindCmd() *cobra.Command {
 	var newTargetLinkAlas *string
 
 	var updateBindCmd = &cobra.Command{
-		Use: "bind LINK_NAME:LINK_ALIAS TARGET_LINK_NAME:TARGET_LINK_ALIAS",
-		Run: func(cmd *cobra.Command, args []string) {
+		Use:   localizer.GetMessageWithoutParam(localizer.CommandUpdateBindUse),
+		Short: localizer.GetMessageWithoutParam(localizer.CommandUpdateBindShort),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			linkName, linkAlias, err := internal.SplitVersion(args[0])
 			if err != nil {
-				logger.LogError(err)
-				return
+				return err
 			}
 			targetName, targetAlias, err := internal.SplitVersion(args[1])
 			if err != nil {
-				logger.LogError(err)
-				return
+				return err
 			}
 			changedCnt := 0
 			var dto = configuration.UpdateBindDTO{
@@ -100,14 +103,13 @@ func createUpdateBindCmd() *cobra.Command {
 			}
 
 			if changedCnt == 0 {
-				fmt.Println("未修改任何字段.")
-				return
+				return localizer.CreateError(localizer.NothingChanged)
 			}
 			err = configuration.UpdateBind(dto)
 			if err != nil {
-				logger.LogError(err)
-				return
+				return err
 			}
+			return nil
 		},
 		Args: cobra.ExactArgs(2),
 	}
@@ -118,8 +120,8 @@ func createUpdateBindCmd() *cobra.Command {
 func init() {
 	var updateCommand = &cobra.Command{
 		Use:   "update",
-		Short: "更新资源。",
-		Long:  "更新特定的资源。",
+		Short: localizer.GetMessageWithoutParam(localizer.CommandUpdateShort),
+		Long:  localizer.GetMessageWithoutParam(localizer.CommandUpdateLong),
 	}
 
 	updateCommand.AddCommand(createUpdateLinkDeclareCmd())
