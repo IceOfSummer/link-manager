@@ -1,8 +1,9 @@
 package configuration
 
 import (
-	"github.com/symbolic-link-manager/internal/localizer"
 	"os"
+
+	"github.com/symbolic-link-manager/internal/localizer"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
@@ -43,15 +44,15 @@ func (t Link) String() string {
 //
 // 首先由 [BindsData] 获取到 [Link.Name]. 之后即可创建一个完整的链接:
 //
-// [BindsData].key : [LinkBindItem.CurrentTag] ==> [LinkBindItem.TargetName] : [LinkBindItem.TargetAlias]
+// [BindsData].key : [LinkBindItem.CurrentTag] ==> [LinkBindItem.TargetName] : [LinkBindItem.TargetTag]
 type LinkBindItem struct {
-	CurrentTag  string
-	TargetName  string
-	TargetAlias string
+	CurrentTag string
+	TargetName string
+	TargetTag  string
 }
 
 func (t LinkBindItem) String() string {
-	return t.TargetName + ":" + t.TargetAlias
+	return t.TargetName + ":" + t.TargetTag
 }
 
 // BindsData
@@ -59,6 +60,7 @@ func (t LinkBindItem) String() string {
 type BindsData map[string][]LinkBindItem
 
 type configuration struct {
+	// TODO: remove this field.
 	DeclaredLinkNames []string
 	Links             []Link
 	Binds             BindsData

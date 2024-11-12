@@ -41,12 +41,12 @@ func UseLink(link *Link) []Link {
 	}
 
 	// use all binds
-	binds := ListBinds(&LinkBindItem{TargetName: link.Name, TargetAlias: link.Tag})
+	binds := ListBinds(link.Name, link.Tag)
 
 	result := make([]Link, 0)
 	result = append(result, *link)
 	for _, v := range binds {
-		result = append(result, UseLink(FindLinkByNameAndAlias(v.TargetName, v.TargetAlias))...)
+		result = append(result, UseLink(FindLinkByNameAndAlias(v.TargetName, v.TargetTag))...)
 	}
 	return result
 }

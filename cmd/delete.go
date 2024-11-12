@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/cobra"
 	"github.com/symbolic-link-manager/internal"
 	"github.com/symbolic-link-manager/internal/configuration"
@@ -22,9 +24,18 @@ func init() {
 		Short: localizer.GetMessageWithoutParam(localizer.CommandDeleteLinkShort),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			deleted := configuration.DeleteLink(args[0], "")
-			if len(deleted) == 0 {
-				return localizer.CreateNoSuchLinkError(args[0])
+			deleted, all, err := configuration.DeleteLink(args[0], "")
+			if err != nil {
+				return err
+			}
+
+			if all {
+				fmt.Println(localizer.GetMessage(&i18n.LocalizeConfig{
+					MessageID: localizer.LinkDeclarationDeleteSuccess,
+					TemplateData: map[string]string{
+						"LinkName": args[0],
+					},
+				}))
 			}
 			fmt.Println(localizer.GetMessageWithoutParam(localizer.MessageDeleteSuccessPrefix))
 			displayer.DisplayLinks(deleted...)
@@ -38,10 +49,19 @@ func init() {
 		Long:  localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVLong),
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			deleted := configuration.DeleteLink(args[0], "")
-			if len(deleted) == 0 {
-				return localizer.CreateNoSuchLinkError(args[0])
+			deleted, all, err := configuration.DeleteLink(args[0], "")
+			if err != nil {
+				return err
 			}
+			if all {
+				fmt.Println(localizer.GetMessage(&i18n.LocalizeConfig{
+					MessageID: localizer.LinkDeclarationDeleteSuccess,
+					TemplateData: map[string]string{
+						"LinkName": args[0],
+					},
+				}))
+			}
+
 			fmt.Println(localizer.GetMessageWithoutParam(localizer.MessageDeleteSuccessPrefix))
 			displayer.DisplayLinks(deleted...)
 			return nil
@@ -62,9 +82,9 @@ func init() {
 				return err
 			}
 			item := configuration.LinkBindItem{
-				CurrentTag:  srcAlias,
-				TargetName:  targetName,
-				TargetAlias: targetAlias,
+				CurrentTag: srcAlias,
+				TargetName: targetName,
+				TargetTag:  targetAlias,
 			}
 			result := configuration.DeleteBind(srcName, &item)
 			if result {

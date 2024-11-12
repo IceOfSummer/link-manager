@@ -4,9 +4,9 @@ package localizer
 const (
 	CommandAddShort       = "command.add.short"
 	CommandAddLong        = "command.add.long"
-	CommandAddLinkUse     = "command.add.link.use"
-	CommandAddLinkShort   = "command.add.link.short"
-	CommandAddLinkLong    = "command.add.link.long"
+	CommandAddLinkUse     = "command.add.link_use"
+	CommandAddLinkShort   = "command.add.link_short"
+	CommandAddLinkLong    = "command.add.link_long"
 	CommandAddLinkSuccess = "command.add.link_add_success"
 	CommandAddLKVUse      = "command.add.lkv_use"
 	CommandAddLKVShort    = "command.add.lkv_short"
@@ -82,8 +82,9 @@ const (
 
 // message
 const (
-	MessageSuccess             = "message.update_success"
-	MessageDeleteSuccessPrefix = "message.delete_success_prefix"
-	NothingChanged             = "message.nothing_changed"
-	NothingFound               = "message.nothing_found"
+	MessageSuccess               = "message.update_success"
+	MessageDeleteSuccessPrefix   = "message.delete_success_prefix"
+	NothingChanged               = "message.nothing_changed"
+	NothingFound                 = "message.nothing_found"
+	LinkDeclarationDeleteSuccess = "message.delete_link_delaration_success"
 )
