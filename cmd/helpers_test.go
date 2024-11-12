@@ -2,10 +2,12 @@
 package cmd
 
 import (
+	"github.com/stretchr/testify/assert"
 	"github.com/symbolic-link-manager/internal/configuration"
 	"os"
 	"path"
 	"runtime"
+	"testing"
 )
 
 func SetUpTestEnvironment() {
@@ -21,4 +23,16 @@ func SetUpTestEnvironment() {
 
 func CleanUp() {
 	_ = os.Remove(path.Join(configuration.AppHome(), "configuration.json"))
+}
+
+func ExecuteCommand(t *testing.T, args ...string) {
+	rootCmd.SetArgs(args)
+	assert.Nil(t, rootCmd.Execute())
+}
+
+func TestMain(m *testing.M) {
+	SetUpTestEnvironment()
+	code := m.Run()
+	CleanUp()
+	os.Exit(code)
 }

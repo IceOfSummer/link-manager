@@ -62,9 +62,9 @@ func init() {
 				return err
 			}
 			item := configuration.LinkBindItem{
-				CurrentTag:  srcAlias,
-				TargetName:  targetName,
-				TargetAlias: targetAlias,
+				CurrentTag: srcAlias,
+				TargetName: targetName,
+				TargetTag:  targetAlias,
 			}
 			result := configuration.DeleteBind(srcName, &item)
 			if result {

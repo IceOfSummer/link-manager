@@ -98,10 +98,6 @@ func AddEnvValue(env *Link) error {
 	return nil
 }
 
-func getBindMapKey(name, alias string) string {
-	return name + ":" + alias
-}
-
 // AddBind target 绑定到 src
 func AddBind(srcName, srcAlias, targetName, targetAlias string) error {
 	config := readConfig()
@@ -109,9 +105,9 @@ func AddBind(srcName, srcAlias, targetName, targetAlias string) error {
 	old, ok := config.Binds[srcName]
 
 	entity := LinkBindItem{
-		CurrentTag:  srcAlias,
-		TargetName:  targetName,
-		TargetAlias: targetAlias,
+		CurrentTag: srcAlias,
+		TargetName: targetName,
+		TargetTag:  targetAlias,
 	}
 	if ok {
 		config.Binds[srcName] = append(old, entity)
@@ -153,14 +149,20 @@ func FindLinkByNameAndAlias(name, alias string) *Link {
 	return nil
 }
 
-func ListBinds(item *LinkBindItem) []LinkBindItem {
+func ListBinds(linkName, tag string) []LinkBindItem {
 	config := readConfig()
 
-	value, ok := config.Binds[getBindMapKey(item.TargetName, item.TargetAlias)]
+	value, ok := config.Binds[linkName]
 	if !ok {
 		return make([]LinkBindItem, 0)
 	}
-	return value
+	result := make([]LinkBindItem, 0)
+	for _, item := range value {
+		if item.CurrentTag == tag {
+			result = append(result, item)
+		}
+	}
+	return result
 }
 
 func GetAllBinds() BindsData {
@@ -168,7 +170,7 @@ func GetAllBinds() BindsData {
 }
 
 func rebuildDeclaredLinks(links []Link) []string {
-	var names []string
+	var names = make([]string, 0)
 	set := make(map[string]struct{})
 	for _, link := range links {
 		_, ok := set[link.Name]
@@ -182,7 +184,7 @@ func rebuildDeclaredLinks(links []Link) []string {
 
 // DeleteLink 删除链接.
 // 如果不提供第二个参数, 则删除全部.
-// 返回被删除的元素
+// 返回被删除的元素, 如果整个链接被删除，则第二个参数返回 true
 func DeleteLink(linkName, alias string) []Link {
 	config := readConfig()
 
@@ -218,7 +220,7 @@ func DeleteBind(rootLinkName string, linkBindItem *LinkBindItem) bool {
 	}
 	for i, item := range result {
 		if item.TargetName == linkBindItem.TargetName &&
-			item.TargetAlias == linkBindItem.TargetAlias &&
+			item.TargetTag == linkBindItem.TargetTag &&
 			item.CurrentTag == linkBindItem.CurrentTag {
 			result = append(result[:i], result[i+1:]...)
 			config.Binds[rootLinkName] = result
@@ -298,12 +300,12 @@ func UpdateBind(dto UpdateBindDTO) error {
 		return errors.New("绑定不存在")
 	}
 	for _, item := range bind {
-		if item.TargetName == dto.TargetName && item.TargetAlias == dto.TargetAlias {
+		if item.TargetName == dto.TargetName && item.TargetTag == dto.TargetAlias {
 			if dto.NewName != "" {
 				item.TargetName = dto.NewName
 			}
 			if dto.NewAlias != "" {
-				item.TargetAlias = dto.NewAlias
+				item.TargetTag = dto.NewAlias
 			}
 			saveConfig(&config)
 			return nil

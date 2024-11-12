@@ -50,11 +50,7 @@ func init() {
 				return
 			}
 
-			root := &configuration.LinkBindItem{
-				TargetName:  args[0],
-				TargetAlias: args[1],
-			}
-			result := configuration.ListBinds(root)
+			result := configuration.ListBinds(args[0], args[1])
 			displayer.DisplayBindsWithStringRoot(args[0], result...)
 		},
 	}

@@ -43,15 +43,15 @@ func (t Link) String() string {
 //
 // 首先由 [BindsData] 获取到 [Link.Name]. 之后即可创建一个完整的链接:
 //
-// [BindsData].key : [LinkBindItem.CurrentTag] ==> [LinkBindItem.TargetName] : [LinkBindItem.TargetAlias]
+// [BindsData].key : [LinkBindItem.CurrentTag] ==> [LinkBindItem.TargetName] : [LinkBindItem.TargetTag]
 type LinkBindItem struct {
-	CurrentTag  string
-	TargetName  string
-	TargetAlias string
+	CurrentTag string
+	TargetName string
+	TargetTag  string
 }
 
 func (t LinkBindItem) String() string {
-	return t.TargetName + ":" + t.TargetAlias
+	return t.TargetName + ":" + t.TargetTag
 }
 
 // BindsData
