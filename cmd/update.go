@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
 	"github.com/symbolic-link-manager/internal"
 	"github.com/symbolic-link-manager/internal/configuration"
@@ -55,7 +56,7 @@ func createUpdateLinkValueCmd() *cobra.Command {
 			if changedCnt == 0 {
 				return localizer.CreateError(localizer.NothingChanged)
 			}
-			err := configuration.UpdateLinkValue(args[0], args[1], updateEntity)
+			err := configuration.UpdateTag(args[0], args[1], updateEntity)
 			if err != nil {
 				return err
 			}
@@ -71,7 +72,7 @@ func createUpdateLinkValueCmd() *cobra.Command {
 
 func createUpdateBindCmd() *cobra.Command {
 	var newTargetLinkName *string
-	var newTargetLinkAlas *string
+	var newTargetLinkTag *string
 
 	var updateBindCmd = &cobra.Command{
 		Use:   localizer.GetMessageWithoutParam(localizer.CommandUpdateBindUse),
@@ -96,9 +97,9 @@ func createUpdateBindCmd() *cobra.Command {
 				changedCnt++
 				dto.NewName = *newTargetLinkName
 			}
-			if newTargetLinkAlas != nil && *newTargetLinkAlas != "" {
+			if newTargetLinkTag != nil && *newTargetLinkTag != "" {
 				changedCnt++
-				dto.NewAlias = *newTargetLinkAlas
+				dto.NewAlias = *newTargetLinkTag
 			}
 
 			if changedCnt == 0 {
@@ -112,7 +113,9 @@ func createUpdateBindCmd() *cobra.Command {
 		},
 		Args: cobra.ExactArgs(2),
 	}
-
+	// TODO: i18n
+	newTargetLinkTag = updateBindCmd.Flags().String("targetTag", "", "target tag")
+	newTargetLinkName = updateBindCmd.Flags().String("targetName", "", "target name")
 	return updateBindCmd
 }
 

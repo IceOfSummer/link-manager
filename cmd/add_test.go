@@ -33,7 +33,7 @@ func TestLinkTagAdd(t *testing.T) {
 	err = rootCmd.Execute()
 	assert.Nil(t, err)
 
-	tags := configuration.ListLinkValues(linkName)
+	tags := configuration.ListLinkTags(linkName)
 	assert.Equal(t, len(tags), 1)
 	assert.Equal(t, path, tags[0].Path)
 	assert.Equal(t, linkName, tags[0].Name)

@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/symbolic-link-manager/internal/localizer"
 	"strings"
+
+	"github.com/symbolic-link-manager/internal/localizer"
 
 	"github.com/symbolic-link-manager/internal/configuration"
 	"github.com/symbolic-link-manager/internal/logger/displayer"
@@ -31,9 +32,9 @@ func init() {
 		Short: localizer.GetMessageWithoutParam(localizer.CommandGetLKVShort),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				displayer.DisplayLinks(configuration.ListLinkValues("")...)
+				displayer.DisplayLinks(configuration.ListLinkTags("")...)
 			} else {
-				displayer.DisplayLinks(configuration.ListLinkValues(args[0])...)
+				displayer.DisplayLinks(configuration.ListLinkTags(args[0])...)
 			}
 		},
 	}

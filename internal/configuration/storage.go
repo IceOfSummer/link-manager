@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"path"
+
+	"github.com/symbolic-link-manager/internal/localizer"
 )
 
 var cache *configuration = nil
@@ -38,9 +40,13 @@ func readConfig() configuration {
 	if err != nil {
 		panic(err)
 	}
-	var configuration configuration
-	err = json.Unmarshal([]byte(content), &configuration)
-	if err != nil {
+	var configuration = configuration{
+		DeclaredLinkNames: make([]string, 0),
+		Links:             make([]Link, 0),
+		Binds:             map[string][]LinkBindItem{},
+	}
+	err = json.Unmarshal(content, &configuration)
+	if err != nil && len(content) > 0 {
 		fmt.Println("Failed to read json config.")
 		panic(err)
 	}
@@ -122,10 +128,10 @@ func ListLinkNames() []string {
 	return readConfig().DeclaredLinkNames
 }
 
-// ListLinkValues 列出所有链接的值。
+// ListLinkTags 列出所有链接的值。
 //
 // 当不传 [name] 时，返回所有的值
-func ListLinkValues(name string) []Link {
+func ListLinkTags(name string) []Link {
 	config := readConfig()
 	if name == "" {
 		return config.Links
@@ -140,7 +146,7 @@ func ListLinkValues(name string) []Link {
 }
 
 func FindLinkByNameAndAlias(name, alias string) *Link {
-	envs := ListLinkValues(name)
+	envs := ListLinkTags(name)
 	for _, v := range envs {
 		if v.Tag == alias {
 			return &v
@@ -185,8 +191,12 @@ func rebuildDeclaredLinks(links []Link) []string {
 // DeleteLink 删除链接.
 // 如果不提供第二个参数, 则删除全部.
 // 返回被删除的元素, 如果整个链接被删除，则第二个参数返回 true
-func DeleteLink(linkName, alias string) []Link {
+func DeleteLink(linkName, alias string) ([]Link, bool, error) {
 	config := readConfig()
+
+	if !config.isDeclarationExist(linkName) {
+		return []Link{}, false, localizer.CreateNoSuchLinkError(linkName)
+	}
 
 	var newLinks []Link
 	var deleted []Link
@@ -205,7 +215,8 @@ func DeleteLink(linkName, alias string) []Link {
 	newDeclaredLinkNames := rebuildDeclaredLinks(newLinks)
 	config.Links = newLinks
 	config.DeclaredLinkNames = newDeclaredLinkNames
-	return deleted
+	saveConfig(&config)
+	return deleted, !config.isDeclarationExist(linkName), nil
 }
 
 // DeleteBind 删除对应的绑定.
@@ -234,36 +245,39 @@ func DeleteBind(rootLinkName string, linkBindItem *LinkBindItem) bool {
 // RenameLinkDeclaration 重命名链接声明
 // 如果没有找到旧的声明，将会返回一个错误.
 func RenameLinkDeclaration(oldName, newName string) error {
-	config := readConfig()
-	pos := config.findDeclaration(oldName)
-	if pos == -1 {
-		return errors.New("旧链接声明不存在")
-	}
-	np := config.findDeclaration(newName)
-	if np != -1 {
-		return errors.New("新链接名称已经存在")
-	}
+	panic("TODO")
+	// config := readConfig()
+	// pos := config.findDeclaration(oldName)
+	// if pos == -1 {
+	// 	return errors.New("旧链接声明不存在")
+	// }
+	// np := config.findDeclaration(newName)
+	// if np != -1 {
+	// 	return errors.New("新链接名称已经存在")
+	// }
 
-	config.DeclaredLinkNames = append(config.DeclaredLinkNames[:pos], config.DeclaredLinkNames[pos+1:]...)
+	// config.DeclaredLinkNames = append(config.DeclaredLinkNames[:pos], config.DeclaredLinkNames[pos+1:]...)
+	// config.DeclaredLinkNames = append(config.DeclaredLinkNames, newName)
 
-	for _, link := range config.Links {
-		if link.Name == oldName {
-			link.Name = newName
-		}
-	}
+	// for _, link := range config.Links {
+	// 	if link.Name == oldName {
+	// 		link.Name = newName
+	// 	}
+	// }
 
-	_, ok := config.Binds[oldName]
-	if ok {
-		config.Binds[newName] = config.Binds[oldName]
-		delete(config.Binds, oldName)
-	}
-	return nil
+	// config.Links[newName] = config.Links[oldName]
+	// _, ok := config.Binds[oldName]
+	// if ok {
+	// 	delete(config.Binds, oldName)
+	// }
+	// saveConfig(&config)
+	// return nil
 }
 
-// UpdateLinkValue 更新链接值
-func UpdateLinkValue(name, alias string, updateEntity Link) error {
+// UpdateTag 更新链接值
+func UpdateTag(name, tag string, updateEntity Link) error {
 	config := readConfig()
-	link := FindLinkByNameAndAlias(name, alias)
+	link := FindLinkByNameAndAlias(name, tag)
 	if link == nil {
 		return errors.New("链接不存在")
 	}

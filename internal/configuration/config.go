@@ -1,8 +1,9 @@
 package configuration
 
 import (
-	"github.com/symbolic-link-manager/internal/localizer"
 	"os"
+
+	"github.com/symbolic-link-manager/internal/localizer"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
@@ -59,6 +60,7 @@ func (t LinkBindItem) String() string {
 type BindsData map[string][]LinkBindItem
 
 type configuration struct {
+	// TODO: remove this field.
 	DeclaredLinkNames []string
 	Links             []Link
 	Binds             BindsData

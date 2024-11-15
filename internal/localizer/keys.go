@@ -82,8 +82,9 @@ const (
 
 // message
 const (
-	MessageSuccess             = "message.update_success"
-	MessageDeleteSuccessPrefix = "message.delete_success_prefix"
-	NothingChanged             = "message.nothing_changed"
-	NothingFound               = "message.nothing_found"
+	MessageSuccess               = "message.update_success"
+	MessageDeleteSuccessPrefix   = "message.delete_success_prefix"
+	NothingChanged               = "message.nothing_changed"
+	NothingFound                 = "message.nothing_found"
+	LinkDeclarationDeleteSuccess = "message.delete_link_delaration_success"
 )
