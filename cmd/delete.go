@@ -81,12 +81,12 @@ func init() {
 			if err != nil {
 				return err
 			}
-			item := configuration.LinkBindItem{
+			item := &configuration.LinkBindItem{
 				CurrentTag: srcAlias,
 				TargetName: targetName,
 				TargetTag:  targetAlias,
 			}
-			result := configuration.DeleteBind(srcName, &item)
+			result := configuration.DeleteBind(srcName, item)
 			if result {
 				fmt.Println(localizer.GetMessageWithoutParam(localizer.MessageDeleteSuccessPrefix))
 				displayer.DisplayBindsWithStringRoot(srcName, item)

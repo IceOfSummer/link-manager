@@ -22,7 +22,7 @@ func TestUpdateLinkName(t *testing.T) {
 
 	assert.True(t, LinkNameExist(newName))
 	assert.False(t, LinkNameExist(linkName))
-	assert.True(t, TagExsit(newName, tag, path))
+	assert.True(t, TagExist(newName, tag, path))
 	assert.True(t, BindExist(newName, tag, linkName1, tag1))
 }
 
@@ -35,7 +35,7 @@ func TestUpdateTag(t *testing.T) {
 	newTag, newPath := tag+"_new", path+"/new"
 	ExecuteCommand(t, "update", "tag", linkName, tag, "--tag="+newTag, "--path="+newPath)
 
-	assert.True(t, TagExsit(linkName, newTag, newPath))
+	assert.True(t, TagExist(linkName, newTag, newPath))
 }
 
 func TestUpdateBind(t *testing.T) {
@@ -45,7 +45,7 @@ func TestUpdateBind(t *testing.T) {
 	ExecuteCommand(t, "add", "link", linkName)
 	ExecuteCommand(t, "add", "tag", linkName, tag, path)
 
-	ExecuteCommand(t, "update", "bind", cur.Name, cur.Tag, "--targetName="+linkName, "--targetTag="+tag)
+	ExecuteCommand(t, "update", "bind", cur.Name+":"+cur.Tag, target.Name+":"+target.Tag, "--targetName="+linkName, "--targetTag="+tag)
 
 	assert.True(t, BindExist(cur.Name, cur.Tag, linkName, tag))
 	assert.False(t, BindExist(cur.Name, cur.Tag, target.Name, target.Tag))

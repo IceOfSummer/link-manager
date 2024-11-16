@@ -88,10 +88,10 @@ func createUpdateBindCmd() *cobra.Command {
 			}
 			changedCnt := 0
 			var dto = configuration.UpdateBindDTO{
-				SrcName:     linkName,
-				SrcAlias:    linkAlias,
-				TargetName:  targetName,
-				TargetAlias: targetAlias,
+				SrcName:    linkName,
+				SrcTag:     linkAlias,
+				TargetName: targetName,
+				TargetTag:  targetAlias,
 			}
 			if newTargetLinkName != nil && *newTargetLinkName != "" {
 				changedCnt++

@@ -78,9 +78,9 @@ success = "Switched: {{ .LinkName }}:{{ .Tag }}"
 noenv = "Please setup environment variabled `SLINK_MANAGER_HOME` before you using"
 invalid_name_mark_pair = "Failed to parse `{{ .Raw }}`, it contains multiply `:`!"
 no_such_link = "Can't find corresponding link declaration: {{ .LinkName }}"
-no_such_link_value = "No such tag: {{ .LinkName }}:{{ .Tag }}"
+no_such_tag = "No such tag: {{ .LinkName }}:{{ .Tag }}"
 no_such_bind = "No such bind"
-
+linkname_already_exist = "Link name already exists: {{ .LinkName }}"
 
 [message]
 update_success = "Update success"

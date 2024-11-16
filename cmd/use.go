@@ -14,9 +14,9 @@ func init() {
 		Use:   localizer.GetMessageWithoutParam(localizer.CommandUse),
 		Short: localizer.GetMessageWithoutParam(localizer.CommandUseShort),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			env := configuration.FindLinkByNameAndAlias(args[0], args[1])
+			env := configuration.FindLinkByNameAndTag(args[0], args[1])
 			if env == nil {
-				return localizer.CreateNoSuchLinkValueError(args[0], args[1])
+				return localizer.CreateNoSuchTagError(args[0], args[1])
 			}
 			recover()
 			r := configuration.UseLink(env)

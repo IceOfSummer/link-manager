@@ -57,11 +57,10 @@ func (t LinkBindItem) String() string {
 
 // BindsData
 // Key 使用 [Link.Name]
-type BindsData map[string][]LinkBindItem
+type BindsData map[string][]*LinkBindItem
 
 type configuration struct {
-	// TODO: remove this field.
 	DeclaredLinkNames []string
-	Links             []Link
+	Links             []*Link
 	Binds             BindsData
 }

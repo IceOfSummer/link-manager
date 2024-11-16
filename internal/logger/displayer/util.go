@@ -8,7 +8,7 @@ import (
 	"github.com/symbolic-link-manager/internal/configuration"
 )
 
-func DisplayLinks(links ...configuration.Link) {
+func DisplayLinks(links ...*configuration.Link) {
 	if len(links) == 0 {
 		fmt.Println(localizer.GetMessageWithoutParam(localizer.NothingFound))
 		return
@@ -25,7 +25,7 @@ func DisplayLinks(links ...configuration.Link) {
 	fmt.Print(builder.String())
 }
 
-func DisplayBindsWithStringRoot(root string, binds ...configuration.LinkBindItem) {
+func DisplayBindsWithStringRoot(root string, binds ...*configuration.LinkBindItem) {
 	if len(binds) == 0 {
 		fmt.Println(localizer.GetMessageWithoutParam(localizer.NothingFound))
 		return

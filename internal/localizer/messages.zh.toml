@@ -78,9 +78,9 @@ success = "切换为: {{ .LinkName }}:{{ .Tag }}"
 noenv = "请在使用前先设置 `SLINK_MANAGER_HOME`。"
 invalid_name_mark_pair = "`{{ .Raw }}` 存在多个 `:`，无法解析别名!"
 no_such_link = "没有找到对应的链接定义: {{ .LinkName }}"
-no_such_link_value = "没有找到对应的链接: {{ .LinkName }}:{{ .Tag }}"
+no_such_tag = "没有找到对应的链接: {{ .LinkName }}:{{ .Tag }}"
 no_such_bind = "指定的绑定不存在"
-
+linkname_already_exist = "链接已经存在: {{ .LinkName }}"
 
 [message]
 update_success = "设置成功"

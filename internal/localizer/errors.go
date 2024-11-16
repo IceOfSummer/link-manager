@@ -13,6 +13,17 @@ func CreateNoSuchLinkError(linkName string) error {
 	}
 }
 
+func CreateLinkNameAlreadyExistError(linkName string) error {
+	return LocalizedError{
+		Config: &i18n.LocalizeConfig{
+			MessageID: "error.linkname_already_exist",
+			TemplateData: map[string]string{
+				"LinkName": linkName,
+			},
+		},
+	}
+}
+
 func CreateError(messageId string) error {
 	return LocalizedError{
 		Config: &i18n.LocalizeConfig{
@@ -21,10 +32,10 @@ func CreateError(messageId string) error {
 	}
 }
 
-func CreateNoSuchLinkValueError(linkName, tag string) error {
+func CreateNoSuchTagError(linkName, tag string) error {
 	return LocalizedError{
 		Config: &i18n.LocalizeConfig{
-			MessageID: "error.no_such_link_value",
+			MessageID: "error.no_such_tag",
 			TemplateData: map[string]string{
 				"LinkName": linkName,
 				"Tag":      tag,

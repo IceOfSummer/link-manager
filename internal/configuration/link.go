@@ -35,7 +35,7 @@ func UseLink(link *Link) []Link {
 		}
 	}
 
-	err = createLink(link.Path, target)
+	err = createLink(filepath.FromSlash(link.Path), target)
 	if err != nil {
 		panic(err)
 	}
@@ -46,7 +46,7 @@ func UseLink(link *Link) []Link {
 	result := make([]Link, 0)
 	result = append(result, *link)
 	for _, v := range binds {
-		result = append(result, UseLink(FindLinkByNameAndAlias(v.TargetName, v.TargetTag))...)
+		result = append(result, UseLink(FindLinkByNameAndTag(v.TargetName, v.TargetTag))...)
 	}
 	return result
 }

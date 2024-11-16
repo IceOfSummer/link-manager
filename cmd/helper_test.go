@@ -20,10 +20,19 @@ func SetUpTestEnvironment() {
 		panic(err)
 	}
 	_ = os.Mkdir(configuration.AppHome(), 0b111_101_000)
+	CleanUp()
 }
 
 func CleanUp() {
-	_ = os.WriteFile(path.Join(configuration.AppHome(), "configuration.json"), []byte(""), 0b111_101_000)
+	target := path.Join(configuration.AppHome(), "configuration.json")
+	stat, err := os.Stat(target)
+	if err != nil {
+		return
+	}
+	if stat.Size() == 0 {
+		return
+	}
+	_ = os.WriteFile(target, []byte(""), 0b111_101_000)
 }
 
 func ExecuteCommand(t *testing.T, args ...string) {
@@ -53,31 +62,31 @@ func LinkNameExist(linkName string) bool {
 	})
 }
 
-// TagExsit
+// TagExist
 // 判断标签是否存在, 如果 [path] 参数为空，则不检查路径
-func TagExsit(linkName, tag, path string) bool {
-	return Exist(configuration.ListLinkTags(linkName), func(link configuration.Link) bool {
+func TagExist(linkName, tag, path string) bool {
+	return Exist(configuration.ListLinkTags(linkName), func(link *configuration.Link) bool {
 		return link.Tag == tag && (path == link.Path || path == "")
 	})
 }
 
 func BindExist(linkName, tag, targetLinkName, targetTag string) bool {
-	return Exist(configuration.ListBinds(linkName, tag), func(bind configuration.LinkBindItem) bool {
+	return Exist(configuration.ListBinds(linkName, tag), func(bind *configuration.LinkBindItem) bool {
 		return bind.CurrentTag == tag && bind.TargetName == targetLinkName && bind.TargetTag == targetTag
 	})
 }
 
 // 创建绑定
 func CreateBind(t *testing.T, baseName string) (*configuration.Link, *configuration.Link) {
-	name, tag, path := baseName, baseName+"_tag", baseName+"/path"
+	name, tag, path0 := baseName, baseName+"_tag", baseName+"/path"
 	name1, tag1, path1 := baseName+"1", baseName+"_tag1", baseName+"/path1"
 	ExecuteCommand(t, "add", "link", name)
-	ExecuteCommand(t, "add", "tag", name, tag, path)
+	ExecuteCommand(t, "add", "tag", name, tag, path0)
 
 	ExecuteCommand(t, "add", "link", name1)
 	ExecuteCommand(t, "add", "tag", name1, tag1, path1)
 
 	ExecuteCommand(t, "add", "bind", name+":"+tag, name1+":"+tag1)
-	return &configuration.Link{Name: name, Tag: tag, Path: path},
+	return &configuration.Link{Name: name, Tag: tag, Path: path0},
 		&configuration.Link{Name: name1, Tag: tag1, Path: path1}
 }

@@ -13,6 +13,7 @@ import (
 var cache *configuration = nil
 var lazyLoadConfigPath string
 
+// getConfigPath 获取配置文件路径
 func getConfigPath() string {
 	if lazyLoadConfigPath != "" {
 		return lazyLoadConfigPath
@@ -22,7 +23,7 @@ func getConfigPath() string {
 	return p
 }
 
-// 读取配置文件
+// readConfig 读取配置文件, 如果有修改了数据, 应该调用 [saveConfig] 进行持久化。
 func readConfig() configuration {
 	if cache != nil {
 		return *cache
@@ -32,8 +33,8 @@ func readConfig() configuration {
 	if os.IsNotExist(err) {
 		return configuration{
 			DeclaredLinkNames: make([]string, 0),
-			Links:             make([]Link, 0),
-			Binds:             map[string][]LinkBindItem{},
+			Links:             make([]*Link, 0),
+			Binds:             map[string][]*LinkBindItem{},
 		}
 	}
 	content, err := os.ReadFile(configFilePath)
@@ -42,8 +43,8 @@ func readConfig() configuration {
 	}
 	var configuration = configuration{
 		DeclaredLinkNames: make([]string, 0),
-		Links:             make([]Link, 0),
-		Binds:             map[string][]LinkBindItem{},
+		Links:             make([]*Link, 0),
+		Binds:             map[string][]*LinkBindItem{},
 	}
 	err = json.Unmarshal(content, &configuration)
 	if err != nil && len(content) > 0 {
@@ -54,6 +55,7 @@ func readConfig() configuration {
 	return configuration
 }
 
+// saveConfig 保存配置
 func saveConfig(configuration *configuration) {
 	configFilePath := getConfigPath()
 	cache = configuration
@@ -75,6 +77,7 @@ func AddEnvDeclaration(declarationName string) {
 	saveConfig(&config)
 }
 
+// isDeclarationExist 判断链接是否已经声明
 func (th *configuration) isDeclarationExist(declarationName string) bool {
 	p := th.findDeclaration(declarationName)
 	if p == -1 {
@@ -99,7 +102,7 @@ func AddEnvValue(env *Link) error {
 	if !config.isDeclarationExist(env.Name) {
 		return errors.New("对应的环境变量没有声明")
 	}
-	config.Links = append(config.Links, *env)
+	config.Links = append(config.Links, env)
 	saveConfig(&config)
 	return nil
 }
@@ -110,7 +113,7 @@ func AddBind(srcName, srcAlias, targetName, targetAlias string) error {
 
 	old, ok := config.Binds[srcName]
 
-	entity := LinkBindItem{
+	entity := &LinkBindItem{
 		CurrentTag: srcAlias,
 		TargetName: targetName,
 		TargetTag:  targetAlias,
@@ -118,12 +121,14 @@ func AddBind(srcName, srcAlias, targetName, targetAlias string) error {
 	if ok {
 		config.Binds[srcName] = append(old, entity)
 	} else {
-		config.Binds[srcName] = []LinkBindItem{entity}
+		config.Binds[srcName] = []*LinkBindItem{entity}
 	}
 	saveConfig(&config)
 	return nil
 }
 
+// ListLinkNames
+// 列出已经声明的链接
 func ListLinkNames() []string {
 	return readConfig().DeclaredLinkNames
 }
@@ -131,12 +136,12 @@ func ListLinkNames() []string {
 // ListLinkTags 列出所有链接的值。
 //
 // 当不传 [name] 时，返回所有的值
-func ListLinkTags(name string) []Link {
+func ListLinkTags(name string) []*Link {
 	config := readConfig()
 	if name == "" {
 		return config.Links
 	}
-	result := make([]Link, 0)
+	result := make([]*Link, 0)
 	for _, v := range config.Links {
 		if v.Name == name {
 			result = append(result, v)
@@ -145,24 +150,28 @@ func ListLinkTags(name string) []Link {
 	return result
 }
 
-func FindLinkByNameAndAlias(name, alias string) *Link {
+// FindLinkByNameAndTag
+// 根据名称和标签搜素链接
+func FindLinkByNameAndTag(name, alias string) *Link {
 	envs := ListLinkTags(name)
 	for _, v := range envs {
 		if v.Tag == alias {
-			return &v
+			return v
 		}
 	}
 	return nil
 }
 
-func ListBinds(linkName, tag string) []LinkBindItem {
+// ListBinds
+// 列出所有的绑定
+func ListBinds(linkName, tag string) []*LinkBindItem {
 	config := readConfig()
 
 	value, ok := config.Binds[linkName]
 	if !ok {
-		return make([]LinkBindItem, 0)
+		return make([]*LinkBindItem, 0)
 	}
-	result := make([]LinkBindItem, 0)
+	result := make([]*LinkBindItem, 0)
 	for _, item := range value {
 		if item.CurrentTag == tag {
 			result = append(result, item)
@@ -171,11 +180,15 @@ func ListBinds(linkName, tag string) []LinkBindItem {
 	return result
 }
 
+// GetAllBinds
+// 获取所有的绑定
 func GetAllBinds() BindsData {
 	return readConfig().Binds
 }
 
-func rebuildDeclaredLinks(links []Link) []string {
+// rebuildDeclaredLinks
+// 根据 [Link] 重新创建已经声明的链接
+func rebuildDeclaredLinks(links []*Link) []string {
 	var names = make([]string, 0)
 	set := make(map[string]struct{})
 	for _, link := range links {
@@ -191,15 +204,15 @@ func rebuildDeclaredLinks(links []Link) []string {
 // DeleteLink 删除链接.
 // 如果不提供第二个参数, 则删除全部.
 // 返回被删除的元素, 如果整个链接被删除，则第二个参数返回 true
-func DeleteLink(linkName, alias string) ([]Link, bool, error) {
+func DeleteLink(linkName, alias string) ([]*Link, bool, error) {
 	config := readConfig()
 
 	if !config.isDeclarationExist(linkName) {
-		return []Link{}, false, localizer.CreateNoSuchLinkError(linkName)
+		return []*Link{}, false, localizer.CreateNoSuchLinkError(linkName)
 	}
 
-	var newLinks []Link
-	var deleted []Link
+	var newLinks []*Link
+	var deleted []*Link
 
 	for _, link := range config.Links {
 		if link.Name != linkName {
@@ -245,41 +258,38 @@ func DeleteBind(rootLinkName string, linkBindItem *LinkBindItem) bool {
 // RenameLinkDeclaration 重命名链接声明
 // 如果没有找到旧的声明，将会返回一个错误.
 func RenameLinkDeclaration(oldName, newName string) error {
-	panic("TODO")
-	// config := readConfig()
-	// pos := config.findDeclaration(oldName)
-	// if pos == -1 {
-	// 	return errors.New("旧链接声明不存在")
-	// }
-	// np := config.findDeclaration(newName)
-	// if np != -1 {
-	// 	return errors.New("新链接名称已经存在")
-	// }
+	config := readConfig()
+	pos := config.findDeclaration(oldName)
+	if pos == -1 {
+		return localizer.CreateNoSuchLinkError(oldName)
+	}
+	np := config.findDeclaration(newName)
+	if np != -1 {
+		return localizer.CreateLinkNameAlreadyExistError(newName)
+	}
 
-	// config.DeclaredLinkNames = append(config.DeclaredLinkNames[:pos], config.DeclaredLinkNames[pos+1:]...)
-	// config.DeclaredLinkNames = append(config.DeclaredLinkNames, newName)
+	for _, link := range config.Links {
+		if link.Name == oldName {
+			link.Name = newName
+		}
+	}
+	config.DeclaredLinkNames = rebuildDeclaredLinks(config.Links)
 
-	// for _, link := range config.Links {
-	// 	if link.Name == oldName {
-	// 		link.Name = newName
-	// 	}
-	// }
-
-	// config.Links[newName] = config.Links[oldName]
-	// _, ok := config.Binds[oldName]
-	// if ok {
-	// 	delete(config.Binds, oldName)
-	// }
-	// saveConfig(&config)
-	// return nil
+	oldBinds, ok := config.Binds[oldName]
+	if ok {
+		config.Binds[newName] = oldBinds
+		delete(config.Binds, oldName)
+	}
+	saveConfig(&config)
+	return nil
 }
 
 // UpdateTag 更新链接值
 func UpdateTag(name, tag string, updateEntity Link) error {
 	config := readConfig()
-	link := FindLinkByNameAndAlias(name, tag)
+	link := FindLinkByNameAndTag(name, tag)
 	if link == nil {
-		return errors.New("链接不存在")
+		return localizer.CreateNoSuchLinkError(name)
 	}
 	if updateEntity.Tag != "" {
 		link.Tag = updateEntity.Tag
@@ -295,11 +305,11 @@ type UpdateBindDTO struct {
 	// Required
 	SrcName string
 	// Required
-	SrcAlias string
+	SrcTag string
 	// Required
 	TargetName string
 	// Required
-	TargetAlias string
+	TargetTag string
 	// Optional
 	NewName string
 	// Optional
@@ -311,10 +321,10 @@ func UpdateBind(dto UpdateBindDTO) error {
 	config := readConfig()
 	bind, ok := config.Binds[dto.SrcName]
 	if !ok {
-		return errors.New("绑定不存在")
+		return localizer.CreateNoSuchTagError(dto.SrcName, dto.SrcTag)
 	}
 	for _, item := range bind {
-		if item.TargetName == dto.TargetName && item.TargetTag == dto.TargetAlias {
+		if item.TargetName == dto.TargetName && item.TargetTag == dto.TargetTag {
 			if dto.NewName != "" {
 				item.TargetName = dto.NewName
 			}
@@ -325,5 +335,5 @@ func UpdateBind(dto UpdateBindDTO) error {
 			return nil
 		}
 	}
-	return errors.New("未找到绑定的目标链接")
+	return localizer.CreateNoSuchTagError(dto.TargetName, dto.TargetTag)
 }

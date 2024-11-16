@@ -33,22 +33,11 @@ func TestDeleteTag(t *testing.T) {
 	ExecuteCommand(t, "add", "tag", linkName, tag, "/val")
 
 	configuration.ListLinkTags(linkName)
-	assert.Equal(t,
-		true,
-		Exist(configuration.ListLinkTags(linkName), func(ele configuration.Link) bool {
-			return ele.Tag == tag
-		}),
-	)
+	assert.True(t, TagExist(linkName, tag, "/val"))
 
 	ExecuteCommand(t, "delete", "tag", linkName, tag)
 
-	assert.Equal(t,
-		false,
-		Exist(configuration.ListLinkTags(linkName), func(ele configuration.Link) bool {
-			return ele.Tag == tag
-		}),
-	)
-
+	assert.False(t, TagExist(linkName, tag, "/val"))
 }
 
 func TestDeleteLinkBind(t *testing.T) {
@@ -61,20 +50,8 @@ func TestDeleteLinkBind(t *testing.T) {
 	ExecuteCommand(t, "add", "tag", name1, tag1, "/val")
 
 	ExecuteCommand(t, "add", "bind", name+":"+tag, name1+":"+tag1)
-
-	assert.Equal(t,
-		true,
-		Exist(configuration.ListBinds(name, tag), func(ele configuration.LinkBindItem) bool {
-			return ele.TargetTag == tag1 && ele.TargetName == name1 && ele.CurrentTag == tag
-		}),
-	)
+	assert.True(t, BindExist(name, tag, name1, tag1))
 
 	ExecuteCommand(t, "delete", "bind", name+":"+tag, name1+":"+tag1)
-
-	assert.Equal(t,
-		false,
-		Exist(configuration.ListBinds(name, tag), func(ele configuration.LinkBindItem) bool {
-			return ele.TargetTag == tag1 && ele.TargetName == name1 && ele.CurrentTag == tag
-		}),
-	)
+	assert.False(t, BindExist(name, tag, name1, tag1))
 }
