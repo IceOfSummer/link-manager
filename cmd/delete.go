@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/symbolic-link-manager/internal/core"
+	"github.com/symbolic-link-manager/internal/storage"
 
-	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/cobra"
 	"github.com/symbolic-link-manager/internal"
-	"github.com/symbolic-link-manager/internal/configuration"
 	"github.com/symbolic-link-manager/internal/localizer"
 	"github.com/symbolic-link-manager/internal/logger/displayer"
 )
@@ -24,18 +24,9 @@ func init() {
 		Short: localizer.GetMessageWithoutParam(localizer.CommandDeleteLinkShort),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			deleted, all, err := configuration.DeleteLink(args[0], "")
+			deleted, err := core.RemoveLink(args[0])
 			if err != nil {
 				return err
-			}
-
-			if all {
-				fmt.Println(localizer.GetMessage(&i18n.LocalizeConfig{
-					MessageID: localizer.LinkDeclarationDeleteSuccess,
-					TemplateData: map[string]string{
-						"LinkName": args[0],
-					},
-				}))
 			}
 			fmt.Println(localizer.GetMessageWithoutParam(localizer.MessageDeleteSuccessPrefix))
 			displayer.DisplayLinks(deleted...)
@@ -43,27 +34,18 @@ func init() {
 		},
 	}
 
-	var deleteLinkValue = &cobra.Command{
-		Use:   localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVUse),
-		Short: localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVShort),
-		Long:  localizer.GetMessageWithoutParam(localizer.CommandDeleteLKVLong),
+	var deleteTag = &cobra.Command{
+		Use:   localizer.GetMessageWithoutParam(localizer.CommandDeleteTagUse),
+		Short: localizer.GetMessageWithoutParam(localizer.CommandDeleteTagShort),
+		Long:  localizer.GetMessageWithoutParam(localizer.CommandDeleteTagLong),
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			deleted, all, err := configuration.DeleteLink(args[0], "")
+			deleted, err := core.RemoveTag(args[0], args[1])
 			if err != nil {
 				return err
 			}
-			if all {
-				fmt.Println(localizer.GetMessage(&i18n.LocalizeConfig{
-					MessageID: localizer.LinkDeclarationDeleteSuccess,
-					TemplateData: map[string]string{
-						"LinkName": args[0],
-					},
-				}))
-			}
-
 			fmt.Println(localizer.GetMessageWithoutParam(localizer.MessageDeleteSuccessPrefix))
-			displayer.DisplayLinks(deleted...)
+			displayer.DisplayLinks(deleted)
 			return nil
 		},
 	}
@@ -73,32 +55,32 @@ func init() {
 		Short: localizer.GetMessageWithoutParam(localizer.CommandDeleteBindShort),
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			srcName, srcAlias, err := internal.SplitVersion(args[0])
+			srcName, currentTag, err := internal.SplitVersion(args[0])
 			if err != nil {
 				return err
 			}
-			targetName, targetAlias, err := internal.SplitVersion(args[1])
+			targetName, targetTag, err := internal.SplitVersion(args[1])
 			if err != nil {
 				return err
 			}
-			item := &configuration.LinkBindItem{
-				CurrentTag: srcAlias,
+
+			item := &storage.LinkBindItem{
+				CurrentTag: currentTag,
 				TargetName: targetName,
-				TargetTag:  targetAlias,
+				TargetTag:  targetTag,
 			}
-			result := configuration.DeleteBind(srcName, item)
-			if result {
-				fmt.Println(localizer.GetMessageWithoutParam(localizer.MessageDeleteSuccessPrefix))
-				displayer.DisplayBindsWithStringRoot(srcName, item)
-			} else {
-				return localizer.CreateNoSuchBindError()
+			err = core.RemoveBind(srcName, item)
+			if err != nil {
+				return err
 			}
+			fmt.Println(localizer.GetMessageWithoutParam(localizer.MessageDeleteSuccessPrefix))
+			displayer.DisplayBindsWithStringRoot(srcName, item)
 			return nil
 		},
 	}
 
 	deleteCommand.AddCommand(deleteLink)
-	deleteCommand.AddCommand(deleteLinkValue)
+	deleteCommand.AddCommand(deleteTag)
 	deleteCommand.AddCommand(deleteBind)
 	rootCmd.AddCommand(deleteCommand)
 

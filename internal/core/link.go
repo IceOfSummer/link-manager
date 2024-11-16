@@ -1,20 +1,30 @@
-// Package configuration 设置环境变量的实现.
-package configuration
+package core
 
 import (
+	"github.com/symbolic-link-manager/internal/logger"
+	"github.com/symbolic-link-manager/internal/storage"
 	"os"
 	"path"
 	"path/filepath"
-
-	"github.com/symbolic-link-manager/internal/logger"
 )
 
 const appDirectory = "app"
 
 // UseLink 使用当前链接.
 // 返回所有设置的链接，包括间接连接的。
-func UseLink(link *Link) []Link {
-	holder := filepath.FromSlash(path.Join(AppHome(), appDirectory))
+func UseLink(linkname, tag string) []*storage.Tag {
+	holder := make([]*storage.Tag, 0)
+	useLink0(storage.FindTag(linkname, tag), &holder)
+	return holder
+}
+
+func useLink0(tag *storage.Tag, resultHolder *[]*storage.Tag) {
+	if tag == nil {
+		return
+	}
+	*resultHolder = append(*resultHolder, tag)
+
+	holder := filepath.FromSlash(path.Join(storage.AppHome(), appDirectory))
 	_, err := os.Stat(holder)
 	if os.IsNotExist(err) {
 		logger.LogDebug("Creating 'app' directory.")
@@ -24,31 +34,30 @@ func UseLink(link *Link) []Link {
 		}
 	}
 
-	target := filepath.FromSlash(path.Join(holder, link.Name))
+	appPath := filepath.FromSlash(path.Join(holder, tag.Linkname))
 
-	lk, _ := os.Readlink(target)
+	lk, _ := os.Readlink(appPath)
 	if lk != "" {
-		logger.LogDebug("Removing old link file.")
-		err := os.Remove(target)
+		logger.LogDebug("Removing old tag file.")
+		err := os.Remove(appPath)
 		if err != nil {
 			panic(err)
 		}
 	}
 
-	err = createLink(filepath.FromSlash(link.Path), target)
+	err = createLink(appPath, tag.Path)
 	if err != nil {
 		panic(err)
 	}
 
 	// use all binds
-	binds := ListBinds(link.Name, link.Tag)
+	binds := ListBinds(tag.Linkname)
 
-	result := make([]Link, 0)
-	result = append(result, *link)
-	for _, v := range binds {
-		result = append(result, UseLink(FindLinkByNameAndTag(v.TargetName, v.TargetTag))...)
+	for _, bind := range binds {
+		if bind.Tag == tag.TagName {
+			useLink0(storage.FindTag(bind.TargetLinkname, bind.TargetLinkname), resultHolder)
+		}
 	}
-	return result
 }
 
 type UsingLink struct {
@@ -57,7 +66,7 @@ type UsingLink struct {
 }
 
 func ListUsing() ([]UsingLink, error) {
-	base := path.Join(AppHome(), "app")
+	base := path.Join(storage.AppHome(), "app")
 	entries, err := os.ReadDir(base)
 	logger.LogDebug("Searching " + base)
 	if err != nil {

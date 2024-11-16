@@ -11,7 +11,7 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
-    name: 'Lint project'
+    name: 'Run CI'
     permissions:
       contents: write
       pull-requests: write
@@ -31,7 +31,7 @@ jobs:
       test_success: ${{ steps.test.conclusion }}
 
   add_label_for_pr:
-    name: 'Add label for pull request'
+    name: 'Add Label For Pull Request'
     needs: ci
     if: ${{ always() && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest

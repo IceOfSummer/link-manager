@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/stretchr/testify/assert"
-	"github.com/symbolic-link-manager/internal/configuration"
+	"github.com/symbolic-link-manager/internal/storage"
 	"os"
 	"path"
 	"path/filepath"
@@ -10,7 +10,7 @@ import (
 )
 
 func readLink(linkName string) (string, error) {
-	home := configuration.AppHome()
+	home := storage.AppHome()
 	lk := path.Join(home, "app", linkName)
 	return os.Readlink(lk)
 }
@@ -31,15 +31,15 @@ func TestUse(t *testing.T) {
 
 func TestBindSwitch(t *testing.T) {
 	cur, target := CreateBind(t, "TestBindSwitch", true)
-	ExecuteCommand(t, "use", cur.Name, cur.Tag)
+	ExecuteCommand(t, "use", cur.Linkname, cur.TagName)
 
-	p, err := readLink(cur.Name)
+	p, err := readLink(cur.Linkname)
 	assert.NoError(t, err)
 	ap, err := filepath.Abs(cur.Path)
 	assert.NoError(t, err)
 	assert.Equal(t, ap, p)
 
-	p1, err := readLink(target.Name)
+	p1, err := readLink(target.Linkname)
 	assert.NoError(t, err)
 	ap1, err := filepath.Abs(target.Path)
 	assert.NoError(t, err)

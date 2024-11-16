@@ -8,9 +8,9 @@ const (
 	CommandAddLinkShort   = "command.add.link_short"
 	CommandAddLinkLong    = "command.add.link_long"
 	CommandAddLinkSuccess = "command.add.link_add_success"
-	CommandAddLKVUse      = "command.add.lkv_use"
-	CommandAddLKVShort    = "command.add.lkv_short"
-	CommandAddLKVLong     = "command.add.lkv_long"
+	CommandAddTagUse      = "command.add.tag_use"
+	CommandAddTagShort    = "command.add.tag_short"
+	CommandAddTagLong     = "command.add.tag_long"
 	CommandAddBindUse     = "command.add.bind_use"
 	CommandAddBindShort   = "command.add.bind_short"
 	CommandAddBindLong    = "command.add.bind_long"
@@ -23,9 +23,9 @@ const (
 	CommandDeleteLong      = "command.delete.long"
 	CommandDeleteLinkUse   = "command.delete.link_use"
 	CommandDeleteLinkShort = "command.delete.link_short"
-	CommandDeleteLKVUse    = "command.delete.lkv_use"
-	CommandDeleteLKVShort  = "command.delete.lkv_short"
-	CommandDeleteLKVLong   = "command.delete.lkv_long"
+	CommandDeleteTagUse    = "command.delete.tag_use"
+	CommandDeleteTagShort  = "command.delete.tag_short"
+	CommandDeleteTagLong   = "command.delete.tag_long"
 	CommandDeleteBindUse   = "command.delete.bind_use"
 	CommandDeleteBindShort = "command.delete.bind_short"
 )
@@ -34,8 +34,8 @@ const (
 const (
 	CommandGetShort      = "command.get.short"
 	CommandGetLinksShort = "command.get.links_short"
-	CommandGetLKVUse     = "command.get.lkv_use"
-	CommandGetLKVShort   = "command.get.lkv_short"
+	CommandGetTagUse     = "command.get.tag_use"
+	CommandGetTagShort   = "command.get.tag_short"
 	CommandGetBindUse    = "command.get.bind_use"
 	CommandGetBindShort  = "command.get.bind_short"
 	CommandGetUsing      = "command.get.using_short"
@@ -53,8 +53,8 @@ const (
 	CommandUpdateLong      = "command.update.long"
 	CommandUpdateLinkUse   = "command.update.link_use"
 	CommandUpdateLinkShort = "command.update.link_short"
-	CommandUpdateLKVUse    = "command.update.lkv_use"
-	CommandUpdateLKVShort  = "command.update.lkv_short"
+	CommandUpdateTagUse    = "command.update.tag_use"
+	CommandUpdateTagShort  = "command.update.tag_short"
 	CommandUpdateBindUse   = "command.update.bind_use"
 	CommandUpdateBindShort = "command.update.bind_short"
 )
@@ -76,8 +76,10 @@ const (
 
 // errors
 const (
-	ErrorInvalidNTPair = "error.invalid_name_mark_pair"
-	ErrorNoSuchBind    = "error.no_such_bind"
+	ErrorInvalidNTPair    = "error.invalid_name_mark_pair"
+	ErrorNoSuchBind       = "error.no_such_bind"
+	ErrorBindNotExist     = "error.bind_not_exist"
+	ErrorBindAlreadyExist = "error.bind_already_exit"
 )
 
 // message
@@ -87,4 +89,5 @@ const (
 	NothingChanged               = "message.nothing_changed"
 	NothingFound                 = "message.nothing_found"
 	LinkDeclarationDeleteSuccess = "message.delete_link_delaration_success"
+	MessageHelp                  = "message.help_message"
 )
