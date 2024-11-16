@@ -44,7 +44,7 @@ jobs:
           actions: 'remove-labels'
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
-          labels: 'test:success, test:fail'
+          labels: 'test:success, test:failed'
       - name: Add label
         uses: actions-cool/issues-helper@v3
         with:
@@ -52,4 +52,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           labels: >
-            ${{ needs.ci.outputs.test_success == 'success' && 'test:success' || 'test:fail' }}
+            ${{ needs.ci.outputs.test_success == 'success' && 'test:success' || 'test:failed' }}
