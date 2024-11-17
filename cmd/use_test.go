@@ -1,12 +1,13 @@
 package cmd
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/symbolic-link-manager/internal/storage"
 	"os"
 	"path"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/symbolic-link-manager/internal/storage"
 )
 
 func readLink(linkName string) (string, error) {
@@ -31,7 +32,7 @@ func TestUse(t *testing.T) {
 
 func TestBindSwitch(t *testing.T) {
 	cur, target := CreateBind(t, "TestBindSwitch", true)
-	ExecuteCommand(t, "use", cur.Linkname, cur.TagName)
+	ExecuteCommand(t, "use", cur.Linkname, cur.TagName, "--debug")
 
 	p, err := readLink(cur.Linkname)
 	assert.NoError(t, err)

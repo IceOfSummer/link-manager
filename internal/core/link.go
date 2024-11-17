@@ -1,11 +1,12 @@
 package core
 
 import (
-	"github.com/symbolic-link-manager/internal/logger"
-	"github.com/symbolic-link-manager/internal/storage"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/symbolic-link-manager/internal/logger"
+	"github.com/symbolic-link-manager/internal/storage"
 )
 
 const appDirectory = "app"
@@ -55,7 +56,7 @@ func useLink0(tag *storage.Tag, resultHolder *[]*storage.Tag) {
 
 	for _, bind := range binds {
 		if bind.Tag == tag.TagName {
-			useLink0(storage.FindTag(bind.TargetLinkname, bind.TargetLinkname), resultHolder)
+			useLink0(storage.FindTag(bind.TargetLinkname, bind.TargetTag), resultHolder)
 		}
 	}
 }
