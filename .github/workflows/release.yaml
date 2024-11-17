@@ -1,0 +1,25 @@
+name: Build And Upload
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build And Upload
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+      - name: Build for windows
+        run: "CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o slm-windows-amd64.exe"
+      - name: Build for linux
+        run: "go build -o slm-linux-amd64"
+      - name: Upload
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            slm-windows-amd64.exe
+            slm-linux-amd64
