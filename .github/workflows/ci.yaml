@@ -26,6 +26,8 @@ jobs:
       - name: Test
         id: test
         run: go test -v ./...
+        env:
+          DEBUG_ENABLED: ${{ runner.debug == '1' && 'true' || 'false' }}
 
     outputs:
       test_success: ${{ steps.test.conclusion }}
