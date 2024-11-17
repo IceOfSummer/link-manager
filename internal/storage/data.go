@@ -3,10 +3,11 @@ package storage
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"github.com/symbolic-link-manager/internal/localizer"
+	"github.com/symbolic-link-manager/internal/logger"
 	"os"
+	"os/exec"
 	"path"
+	"path/filepath"
 )
 
 var lazyLoadAppHome string
@@ -17,12 +18,28 @@ func AppHome() string {
 	if lazyLoadAppHome != "" {
 		return lazyLoadAppHome
 	}
-	home, ok := os.LookupEnv(AppHomeEnvKey)
-	if !ok {
-		panic(localizer.GetMessage(&i18n.LocalizeConfig{MessageID: "error.noenv"}))
+	lazyLoadAppHome = appHome0()
+	logger.LogDebug("App home is " + lazyLoadAppHome)
+	return lazyLoadAppHome
+}
+
+func appHome0() string {
+	if lazyLoadAppHome != "" {
+		return lazyLoadAppHome
 	}
-	lazyLoadAppHome = home
-	return home
+	home, ok := os.LookupEnv(AppHomeEnvKey)
+	if ok {
+		return home
+	}
+	executablePath, err := exec.LookPath(os.Args[0])
+	if err != nil {
+		panic(err)
+	}
+	executableAbsPath, err := filepath.Abs(executablePath)
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Dir(executableAbsPath)
 }
 
 var cache *configuration = nil

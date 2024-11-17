@@ -56,12 +56,13 @@ func init() {
 	var getUsing = &cobra.Command{
 		Use:   "using",
 		Short: localizer.GetMessageWithoutParam(localizer.CommandGetUsing),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			using, err := core.ListUsing()
 			if err != nil {
-				panic(err)
+				return err
 			}
 			displayer.DisplayUsingLink(using)
+			return nil
 		},
 	}
 
