@@ -1,97 +1,102 @@
 # symbolic-link-manager
 
-一个管理系统软连接的工具，通常用于快速切换 SDK 工具的版本。
+[中文文档](/README_zh.md)
 
-## 安装
+A tool to manage system symbolic link, usually used to switch SDK version.
 
-从 [Release](https://github.com/IceOfSummer/symbolic-link-manager/releases) 列表下载最新版本，然后放在任意目录中.
+## Install
 
-推荐添加如下环境变量(可选, 不添加不影响使用。**如果不提供，默认使用可执行文件所在的目录**):
+Download from [Release](https://github.com/IceOfSummer/symbolic-link-manager/releases), and put the executable file to any empty folder.
 
-- `SLINK_MANAGER_HOME`: 存放数据的目录
+You can add the environment variable below for better use():
 
-> [!TIP]
-> 添加完成后同样推荐添加 `Path` 路径，方便后续使用。
+- `SLINK_MANAGER_HOME`: The folder to save data and executable file. **The default value is the folder where the executable exist.**
+- Add the executable file to `Path`
 
-## 使用用例
+These environment variables are **optional**, you can also continue to use if you don't provide.
 
-### 切换 Java 版本
+## Example
 
-在系统中有两个 `Java` 版本:
+### Switch Java version
+
+We have two `Java` here:
 
 - `C:\Program Files\Java\jdk-17`
 - `C:\Program Files\Java\jdk8u432-b06`
 
-依次使用下列命令来管理这两个版本:
+Manage these version by the command below:
 
 ```shell
-# 声明一个(软)链接，名称为 java
+# Declare a (symbolic) link，which name is `java`
 slm add link java
 
-# 为链接打标签
+# Add a tag for the link
 slm add tag java 17 "C:\Program Files\Java\jdk-17"
 slm add tag java 8 "C:\Program Files\Java\jdk8u432-b06"
 
-# 切换版本
+# Switch the tag
 slm use java 17
 ```
 
-此时将会在 `$SLINK_MANAGER_HOME/app/` 目录创建一个名称为 `java` 的软连接。之后你需要将 `JAVA_HOME` 的值设置为对应的软连接路径:
+After all, a symbolic link named `java` will be created, it will locate at `$SLINK_MANAGER_HOME/app/`. Now you should set your
+`JAVA_HOME` to this directory: 
 
 - windows: `%SLINK_MANAGER_HOME%\app\java`
-- linux: `export JAVA_HOME=$SLINK_MANAGER_HOME/app/java`
+- linux: `$SLINK_MANAGER_HOME/app/java`
+
+Replace the `SLINK_MANAGER_HOME` if you don't set it in environment variable.
 
 > [!NOTE]
-> 这里还需确保你已经添加了 `%JAVA_HOME%/bin`(windows) / `$JAVA_HOME/bin`(linux) 到 `Path` 中。 
+> Make sure you also add `%JAVA_HOME%/bin`(windows) / `$JAVA_HOME/bin`(linux) to your `Path`。 
 
-**仅第一次设置时需要重新打开终端才会生效，之后切换版本时不需要再重新打开**。
+**Then reopen the terminal. You only need to reopen the terminal the first time you set up the configuration for it to take effect.**。
 
-设置完成后，查看 Java 版本:
+After all, check you java version:
 
 ![java-switch](/doc/java-switch.png)
 
-#### 当切换 Java 版本后自带切换 Maven 版本
+#### Switch the Maven version when switch the version of Java
 
-当切换到 Java17 后，自动将 Maven 切换到 `3.8.8`。当切换到 Java8 后，自动将 Maven 切换到 `3.6.3`。
+When we switched to Java 17, automatically switch the Maven version to `3.8.8`. And when using Java 8，switch Maven to `3.6.3`。
 
-Maven 目录:
+Maven directories:
 
 - `D:\DevelopmentTool\apache-maven-3.6.3`
 - `D:\DevelopmentTool\apache-maven-3.8.8`
 
-管理这两个版本:
+Manage these two versions:
 
 ```shell
-# 声明一个(软)链接，名称为 maven
+# Declare a (symbolic) link，which name is `maven`
 slm add link maven
 
-# 为链接打标签
+# Add a tag for the link
 slm add tag maven 3.6 "D:\DevelopmentTool\apache-maven-3.6.3"
 slm add tag maven 3.8 "D:\DevelopmentTool\apache-maven-3.8.8"
 
-# 和 Java 绑定(Java 的链接需要提前创建)
+# Bind to Java (You should create it before you use.)
 slm add bind java:17 maven:3.8
 slm add bind java:8 maven:3.6
 
-# 先使用一次，不然不会创建软连接
+# Switch to maven 3.6
 slm use maven 3.6
 ```
 
-执行完成后，将环境变量 `MAVEN_HOME` 设置为 `%SLINK_MANAGER_HOME%\app\maven` (windows).
+After this, set the environment variable `MAVEN_HOME` to `%SLINK_MANAGER_HOME%\app\maven` (windows).
 
-此时完成设置，切换 Java 版本将会跟着切换 Maven 版本：
+Now, when you switch the Java version will switch bound Maven version too:
 
 ![绑定](/doc/bind.png)
 
 
-### 切换 NodeJs 版本
+### Switch Node.js version
 
-NodeJS 目录:
+NodeJS directories:
 
 - `D:\DevelopmentTool\symbolic-link-manager\sdk\nodejs\node-v22.11.0-win-x64`
 - `D:\DevelopmentTool\symbolic-link-manager\sdk\nodejs\node-v20.18.0-win-x64`
 
-管理这两个版本:
+Manage these two versions:
 
 ```shell
 slm add link node
@@ -102,5 +107,5 @@ slm add tag node 22 "D:\DevelopmentTool\symbolic-link-manager\sdk\nodejs\node-v2
 slm use node 20
 ```
 
-添加环境变量(Path): `D:\DevelopmentTool\symbolic-link-manager\app\node` 如果你设置了 `SLINK_MANAGER_HOME`，
-也可以使用 `%SLINK_MANAGER_HOME%\app\node`.
+Add the `Path` variable: `D:\DevelopmentTool\symbolic-link-manager\app\node`. If you have set the `SLINK_MANAGER_HOME`,
+you can use `%SLINK_MANAGER_HOME%\app\node` instead.
