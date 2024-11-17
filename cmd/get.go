@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/symbolic-link-manager/internal/core"
 	"strings"
 
 	"github.com/symbolic-link-manager/internal/localizer"
 
-	"github.com/symbolic-link-manager/internal/configuration"
 	"github.com/symbolic-link-manager/internal/logger/displayer"
 
 	"github.com/spf13/cobra"
@@ -22,19 +22,19 @@ func init() {
 		Use:   "links",
 		Short: localizer.GetMessageWithoutParam(localizer.CommandGetLinksShort),
 		Run: func(cmd *cobra.Command, args []string) {
-			names := configuration.ListLinkNames()
+			names := core.ListDeclaredLinkNames()
 			fmt.Print(strings.Join(names, "\n"))
 		},
 	}
 
-	var getEnvValue = &cobra.Command{
-		Use:   localizer.GetMessageWithoutParam(localizer.CommandGetLKVUse),
-		Short: localizer.GetMessageWithoutParam(localizer.CommandGetLKVShort),
+	var getTags = &cobra.Command{
+		Use:   localizer.GetMessageWithoutParam(localizer.CommandGetTagUse),
+		Short: localizer.GetMessageWithoutParam(localizer.CommandGetTagShort),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				displayer.DisplayLinks(configuration.ListLinkTags("")...)
+				displayer.DisplayLinks(core.ListTags("")...)
 			} else {
-				displayer.DisplayLinks(configuration.ListLinkTags(args[0])...)
+				displayer.DisplayLinks(core.ListTags(args[0])...)
 			}
 		},
 	}
@@ -43,24 +43,21 @@ func init() {
 		Use:   localizer.GetMessageWithoutParam(localizer.CommandGetBindUse),
 		Short: localizer.GetMessageWithoutParam(localizer.CommandGetBindShort),
 		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) == 0 {
-				binds := configuration.GetAllBinds()
-				for k, v := range binds {
-					displayer.DisplayBindsWithStringRoot(k, v...)
-				}
-				return
-			}
 
-			result := configuration.ListBinds(args[0], args[1])
-			displayer.DisplayBindsWithStringRoot(args[0], result...)
+			if len(args) == 0 {
+				displayer.DisplayBindsVO(core.ListBinds(""))
+			} else {
+				displayer.DisplayBindsVO(core.ListBinds(args[0]))
+			}
 		},
+		Args: cobra.MaximumNArgs(1),
 	}
 
 	var getUsing = &cobra.Command{
 		Use:   "using",
 		Short: localizer.GetMessageWithoutParam(localizer.CommandGetUsing),
 		Run: func(cmd *cobra.Command, args []string) {
-			using, err := configuration.ListUsing()
+			using, err := core.ListUsing()
 			if err != nil {
 				panic(err)
 			}
@@ -69,7 +66,7 @@ func init() {
 	}
 
 	getCommand.AddCommand(getLinks)
-	getCommand.AddCommand(getEnvValue)
+	getCommand.AddCommand(getTags)
 	getCommand.AddCommand(getBound)
 	getCommand.AddCommand(getUsing)
 

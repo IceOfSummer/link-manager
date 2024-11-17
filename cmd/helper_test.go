@@ -2,6 +2,8 @@
 package cmd
 
 import (
+	"github.com/symbolic-link-manager/internal/core"
+	"github.com/symbolic-link-manager/internal/storage"
 	"os"
 	"path"
 	"path/filepath"
@@ -9,23 +11,22 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/symbolic-link-manager/internal/configuration"
 )
 
 func SetUpTestEnvironment() {
 	_, filename, _, _ := runtime.Caller(0)
 	root := path.Dir(path.Join(filename, ".."))
 
-	err := os.Setenv(configuration.AppHomeEnvKey, path.Join(root, "tmp"))
+	err := os.Setenv(storage.AppHomeEnvKey, path.Join(root, "tmp"))
 	if err != nil {
 		panic(err)
 	}
-	_ = os.Mkdir(configuration.AppHome(), 0b111_101_000)
+	_ = os.Mkdir(storage.AppHome(), 0b111_101_000)
 	CleanUp()
 }
 
 func CleanUp() {
-	target := path.Join(configuration.AppHome(), "configuration.json")
+	target := path.Join(storage.AppHome(), "configuration.json")
 	stat, err := os.Stat(target)
 	if err != nil {
 		return
@@ -38,7 +39,7 @@ func CleanUp() {
 
 func ExecuteCommand(t *testing.T, args ...string) {
 	rootCmd.SetArgs(args)
-	assert.Nil(t, rootCmd.Execute())
+	assert.NoError(t, rootCmd.Execute())
 }
 
 func TestMain(m *testing.M) {
@@ -58,7 +59,7 @@ func Exist[E any](slice []E, searchFn func(ele E) bool) bool {
 }
 
 func LinkNameExist(linkName string) bool {
-	return Exist(configuration.ListLinkNames(), func(name string) bool {
+	return Exist(core.ListDeclaredLinkNames(), func(name string) bool {
 		return name == linkName
 	})
 }
@@ -66,20 +67,20 @@ func LinkNameExist(linkName string) bool {
 // TagExist
 // 判断标签是否存在, 如果 [path] 参数为空，则不检查路径
 func TagExist(linkName, tag, path string) bool {
-	return Exist(configuration.ListLinkTags(linkName), func(link *configuration.Link) bool {
-		return link.Tag == tag && (path == link.Path || path == "")
+	return Exist(core.ListTags(linkName), func(link *storage.Tag) bool {
+		return link.TagName == tag && (path == link.Path || path == "")
 	})
 }
 
 func BindExist(linkName, tag, targetLinkName, targetTag string) bool {
-	return Exist(configuration.ListBinds(linkName, tag), func(bind *configuration.LinkBindItem) bool {
-		return bind.CurrentTag == tag && bind.TargetName == targetLinkName && bind.TargetTag == targetTag
+	return Exist(core.ListBinds(linkName), func(bind *core.BindVO) bool {
+		return bind.Tag == tag && bind.TargetLinkname == targetLinkName && bind.TargetTag == targetTag
 	})
 }
 
 // 准备测试使用文件夹
 func prepareTestDirectory(linkName string) (string, error) {
-	home := configuration.AppHome()
+	home := storage.AppHome()
 
 	testRoot := path.Join(home, "test")
 	_ = os.Mkdir(testRoot, 0b111_111_101)
@@ -101,7 +102,7 @@ func prepareTestDirectory(linkName string) (string, error) {
 }
 
 // 创建绑定
-func CreateBind(t *testing.T, baseName string, useRealDirectory bool) (*configuration.Link, *configuration.Link) {
+func CreateBind(t *testing.T, baseName string, useRealDirectory bool) (*storage.Tag, *storage.Tag) {
 	name, tag := baseName, baseName+"_tag"
 	name1, tag1 := baseName+"1", baseName+"_tag1"
 	var path0, path1 string
@@ -124,6 +125,14 @@ func CreateBind(t *testing.T, baseName string, useRealDirectory bool) (*configur
 	ExecuteCommand(t, "add", "tag", name1, tag1, path1)
 
 	ExecuteCommand(t, "add", "bind", name+":"+tag, name1+":"+tag1)
-	return &configuration.Link{Name: name, Tag: tag, Path: path0},
-		&configuration.Link{Name: name1, Tag: tag1, Path: path1}
+	return &storage.Tag{Linkname: name, TagName: tag, Path: path0},
+		&storage.Tag{Linkname: name1, TagName: tag1, Path: path1}
+}
+
+func AbsPath(p string) string {
+	abs, err := filepath.Abs(p)
+	if err != nil {
+		panic(err)
+	}
+	return abs
 }

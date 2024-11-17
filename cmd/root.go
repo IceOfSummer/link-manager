@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/symbolic-link-manager/internal"
 	"github.com/symbolic-link-manager/internal/localizer"
 	"os"
@@ -16,6 +15,8 @@ var rootCmd = &cobra.Command{
 	CompletionOptions: cobra.CompletionOptions{
 		DisableDefaultCmd: true,
 	},
+	SilenceErrors: true,
+	SilenceUsage:  true,
 }
 
 func init() {
@@ -24,7 +25,9 @@ func init() {
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		println(err.Error())
+		println()
+		println(localizer.GetMessageWithoutParam(localizer.MessageHelp))
 		os.Exit(1)
 	}
 }

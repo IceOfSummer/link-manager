@@ -44,6 +44,18 @@ func CreateNoSuchTagError(linkName, tag string) error {
 	}
 }
 
+func CreateTagAlreadyExistError(linkname, tagName string) error {
+	return LocalizedError{
+		Config: &i18n.LocalizeConfig{
+			MessageID: "error.tag_already_exist",
+			TemplateData: map[string]string{
+				"Linkname": linkname,
+				"Tag":      tagName,
+			},
+		},
+	}
+}
+
 // CreateNoSuchBindError
 // Deprecated, use [CreateError] instead.
 func CreateNoSuchBindError() error {

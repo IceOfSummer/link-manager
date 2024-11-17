@@ -1,10 +1,11 @@
 package cmd
 
 import (
+	"github.com/symbolic-link-manager/internal/core"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/symbolic-link-manager/internal/configuration"
 )
 
 func TestLinkDeclarationAdd(t *testing.T) {
@@ -14,7 +15,7 @@ func TestLinkDeclarationAdd(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	names := configuration.ListLinkNames()
+	names := core.ListDeclaredLinkNames()
 	assert.Equal(t, 1, len(names))
 	assert.Equal(t, linkName, names[0])
 }
@@ -27,17 +28,17 @@ func TestLinkTagAdd(t *testing.T) {
 		t.Error(err)
 	}
 
-	path := "/opt"
+	path, _ := filepath.Abs("/opt")
 	tag := "ttt"
 	rootCmd.SetArgs([]string{"add", "tag", linkName, tag, path})
 	err = rootCmd.Execute()
 	assert.Nil(t, err)
 
-	tags := configuration.ListLinkTags(linkName)
+	tags := core.ListTags(linkName)
 	assert.Equal(t, len(tags), 1)
 	assert.Equal(t, path, tags[0].Path)
-	assert.Equal(t, linkName, tags[0].Name)
-	assert.Equal(t, tag, tags[0].Tag)
+	assert.Equal(t, linkName, tags[0].Linkname)
+	assert.Equal(t, tag, tags[0].TagName)
 }
 
 func TestBindAdd(t *testing.T) {
@@ -52,8 +53,8 @@ func TestBindAdd(t *testing.T) {
 
 	ExecuteCommand(t, "add", "bind", linkName+":"+commonTag, linkName2+":"+commonTag2)
 
-	binds := configuration.ListBinds(linkName, commonTag)
+	binds := core.ListBinds(linkName)
 	assert.Equal(t, 1, len(binds))
-	assert.Equal(t, binds[0].TargetName, linkName2)
+	assert.Equal(t, binds[0].TargetLinkname, linkName2)
 	assert.Equal(t, binds[0].TargetTag, commonTag2)
 }
