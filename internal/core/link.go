@@ -13,10 +13,14 @@ const appDirectory = "app"
 
 // UseLink 使用当前链接.
 // 返回所有设置的链接，包括间接连接的。
-func UseLink(linkname, tag string) []*storage.Tag {
+func UseLink(linkname, tag string) ([]*storage.Tag, error) {
+	err := EnsureTagStatus(linkname, tag, true)
+	if err != nil {
+		return nil, err
+	}
 	holder := make([]*storage.Tag, 0)
 	useLink0(storage.FindTag(linkname, tag), &holder)
-	return holder
+	return holder, nil
 }
 
 func useLink0(tag *storage.Tag, resultHolder *[]*storage.Tag) {

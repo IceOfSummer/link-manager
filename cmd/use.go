@@ -14,7 +14,10 @@ func init() {
 		Use:   localizer.GetMessageWithoutParam(localizer.CommandUse),
 		Short: localizer.GetMessageWithoutParam(localizer.CommandUseShort),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			r := core.UseLink(args[0], args[1])
+			r, err := core.UseLink(args[0], args[1])
+			if err != nil {
+				return err
+			}
 			for _, v := range r {
 				fmt.Println(localizer.GetMessage(&i18n.LocalizeConfig{
 					MessageID: localizer.CommandUseSuccess,
